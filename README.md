@@ -1,4 +1,4 @@
-# AMS Transcription Suite v4.0
+# Transcription Suite v4.0
 
 **Healthcare-Compliant Medical Documentation Automation for AMS Clinic**
 

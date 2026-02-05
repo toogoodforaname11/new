@@ -1,0 +1,33 @@
+{
+  "name": "ams-transcription-suite-v4",
+  "version": "4.0.0",
+  "description": "AMS Transcription Suite v4.0 - Complete React application with pdf-lib integration, bilingual EN/FR support, security gates, and HITL approval workflow",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 3000",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "pdf-lib": "^1.17.1",
+    "lucide-react": "^0.294.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17",
+    "@vitejs/plugin-react": "^4.2.1",
+    "vite": "^5.0.8"
+  },
+  "keywords": [
+    "transcription",
+    "medical",
+    "pdf",
+    "bilingual",
+    "react",
+    "vite"
+  ],
+  "license": "MIT"
+}

@@ -1702,8 +1702,20 @@ export default function AMSTranscriptionSuite() {
       let pdfDoc;
       let usedTemplate = false;
 
-      // Try to load existing PDF template
-      if (schema && schema.pdfTemplate) {
+      // PRIORITY 1: Check for user-uploaded template (approved via HITL)
+      if (pdfTemplates[selectedForm] && pdfTemplates[selectedForm].bytes) {
+        try {
+          pdfDoc = await PDFDocument.load(pdfTemplates[selectedForm].bytes);
+          await fillPdfFormFields(pdfDoc, schema, notesData.formData);
+          usedTemplate = true;
+          addAlert('success', `Filled user-uploaded template: ${pdfTemplates[selectedForm].fileName || selectedForm}`);
+        } catch (uploadedTemplateError) {
+          console.warn('Failed to use uploaded template, trying default:', uploadedTemplateError);
+        }
+      }
+
+      // PRIORITY 2: Try to load from schema's pdfTemplate path
+      if (!usedTemplate && schema && schema.pdfTemplate) {
         const templateBytes = await loadPdfTemplate(schema.pdfTemplate);
         if (templateBytes) {
           pdfDoc = await PDFDocument.load(templateBytes);
@@ -1713,7 +1725,7 @@ export default function AMSTranscriptionSuite() {
         }
       }
 
-      // If no template available, create new PDF with form data
+      // PRIORITY 3: If no template available, create new PDF with form data
       if (!usedTemplate) {
         pdfDoc = await PDFDocument.create();
         const page = pdfDoc.addPage([612, 792]); // Letter size
@@ -2020,32 +2032,284 @@ export default function AMSTranscriptionSuite() {
     }
   };
 
-  // Handle PDF template upload
+  // State for pending template approvals
+  const [pendingTemplates, setPendingTemplates] = useState([]);
+  const [showTemplateApproval, setShowTemplateApproval] = useState(false);
+  const [currentPendingTemplate, setCurrentPendingTemplate] = useState(null);
+
+  // Auto-detect form type based on PDF field names
+  const detectFormType = (fieldNames) => {
+    const fieldNamesLower = fieldNames.map(f => f.toLowerCase());
+    const scores = {};
+
+    Object.entries(formSchemas).forEach(([formId, schema]) => {
+      let matchCount = 0;
+      let totalFields = 0;
+
+      schema.sections.forEach(section => {
+        section.fields.forEach(field => {
+          totalFields++;
+          const pdfFieldLower = (field.pdfField || '').toLowerCase();
+          if (fieldNamesLower.some(fn =>
+            fn.includes(pdfFieldLower) ||
+            pdfFieldLower.includes(fn) ||
+            fn.replace(/[\s_-]/g, '') === pdfFieldLower.replace(/[\s_-]/g, '')
+          )) {
+            matchCount++;
+          }
+        });
+      });
+
+      scores[formId] = {
+        matches: matchCount,
+        total: totalFields,
+        percentage: totalFields > 0 ? Math.round((matchCount / totalFields) * 100) : 0
+      };
+    });
+
+    // Sort by match percentage
+    const sorted = Object.entries(scores)
+      .sort((a, b) => b[1].percentage - a[1].percentage);
+
+    return {
+      bestMatch: sorted[0] ? { formId: sorted[0][0], ...sorted[0][1] } : null,
+      allMatches: sorted.filter(([_, s]) => s.percentage > 10)
+        .map(([formId, s]) => ({ formId, ...s }))
+    };
+  };
+
+  // Handle PDF template upload with auto-detection and HITL approval
   const handleTemplateUpload = async (event) => {
     const file = event.target.files[0];
-    if (file && file.type === 'application/pdf') {
-      try {
-        const arrayBuffer = await file.arrayBuffer();
-        const pdfDoc = await PDFDocument.load(arrayBuffer);
-        const form = pdfDoc.getForm();
-        const fields = form.getFields();
-
-        // Store template
-        setPdfTemplates(prev => ({
-          ...prev,
-          [selectedForm]: {
-            bytes: arrayBuffer,
-            fields: fields.map(f => ({ name: f.getName(), type: f.constructor.name }))
-          }
-        }));
-
-        addAlert('success', `Template uploaded with ${fields.length} form fields`);
-        console.log('PDF Form Fields:', fields.map(f => `${f.getName()} (${f.constructor.name})`));
-      } catch (error) {
-        addAlert('error', 'Failed to parse PDF template');
-        console.error('Template parse error:', error);
-      }
+    if (!file || file.type !== 'application/pdf') {
+      addAlert('error', 'Please upload a valid PDF file');
+      return;
     }
+
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const pdfDoc = await PDFDocument.load(arrayBuffer);
+      const form = pdfDoc.getForm();
+      const fields = form.getFields();
+
+      const fieldInfo = fields.map(f => ({
+        name: f.getName(),
+        type: f.constructor.name.replace('PDF', '').replace('Field', '')
+      }));
+
+      const fieldNames = fieldInfo.map(f => f.name);
+      const detection = detectFormType(fieldNames);
+
+      // Create pending template for approval
+      const pendingTemplate = {
+        id: Date.now(),
+        fileName: file.name,
+        fileSize: file.size,
+        bytes: arrayBuffer,
+        fields: fieldInfo,
+        fieldCount: fields.length,
+        detectedFormType: detection.bestMatch?.formId || null,
+        detectedConfidence: detection.bestMatch?.percentage || 0,
+        allMatches: detection.allMatches,
+        selectedFormType: detection.bestMatch?.formId || selectedForm,
+        status: 'pending_approval',
+        uploadedAt: new Date().toISOString()
+      };
+
+      setPendingTemplates(prev => [...prev, pendingTemplate]);
+      setCurrentPendingTemplate(pendingTemplate);
+      setShowTemplateApproval(true);
+
+      // Log for debugging
+      console.log('=== PDF TEMPLATE ANALYSIS ===');
+      console.log('File:', file.name);
+      console.log('Fields found:', fields.length);
+      console.log('Field names:', fieldNames);
+      console.log('Detection results:', detection);
+      console.log('=============================');
+
+      addAlert('info', `PDF analyzed: ${fields.length} fields found. Approval required.`);
+
+    } catch (error) {
+      addAlert('error', 'Failed to parse PDF: ' + error.message);
+      console.error('Template parse error:', error);
+    }
+  };
+
+  // Approve pending template
+  const approveTemplate = (templateId, selectedFormType) => {
+    const template = pendingTemplates.find(t => t.id === templateId);
+    if (!template) return;
+
+    // Store approved template
+    setPdfTemplates(prev => ({
+      ...prev,
+      [selectedFormType]: {
+        bytes: template.bytes,
+        fields: template.fields,
+        fileName: template.fileName,
+        approvedAt: new Date().toISOString()
+      }
+    }));
+
+    // Update pending template status
+    setPendingTemplates(prev => prev.map(t =>
+      t.id === templateId
+        ? { ...t, status: 'approved', selectedFormType }
+        : t
+    ));
+
+    setShowTemplateApproval(false);
+    setCurrentPendingTemplate(null);
+
+    addAlert('success', `Template approved for ${formSchemas[selectedFormType]?.name[language] || selectedFormType}`);
+  };
+
+  // Reject pending template
+  const rejectTemplate = (templateId) => {
+    setPendingTemplates(prev => prev.map(t =>
+      t.id === templateId
+        ? { ...t, status: 'rejected' }
+        : t
+    ));
+
+    setShowTemplateApproval(false);
+    setCurrentPendingTemplate(null);
+
+    addAlert('warning', 'Template rejected');
+  };
+
+  // Render template approval modal
+  const renderTemplateApprovalModal = () => {
+    if (!showTemplateApproval || !currentPendingTemplate) return null;
+
+    const template = currentPendingTemplate;
+
+    return (
+      <div style={styles.modal}>
+        <div style={{ ...styles.modalContent, maxWidth: '700px' }}>
+          <h2 style={styles.modalTitle}>
+            PDF Template Approval Required
+          </h2>
+
+          <div style={{ ...styles.alert('warning'), marginBottom: '20px' }}>
+            <span>⚠️</span>
+            <span>New PDF template requires your approval before use in workflow</span>
+          </div>
+
+          {/* File Info */}
+          <div style={styles.section}>
+            <h3 style={styles.sectionTitle}>File Information</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+              <div><strong>File:</strong> {template.fileName}</div>
+              <div><strong>Size:</strong> {Math.round(template.fileSize / 1024)} KB</div>
+              <div><strong>Fields Found:</strong> {template.fieldCount}</div>
+              <div><strong>Uploaded:</strong> {new Date(template.uploadedAt).toLocaleString()}</div>
+            </div>
+          </div>
+
+          {/* Auto-Detection Results */}
+          <div style={styles.section}>
+            <h3 style={styles.sectionTitle}>AI Form Detection</h3>
+            {template.detectedFormType ? (
+              <>
+                <div style={{ marginBottom: '12px' }}>
+                  <span style={styles.badge(template.detectedConfidence > 50 ? 'success' : 'warning')}>
+                    {template.detectedConfidence}% confidence
+                  </span>
+                  <span style={{ marginLeft: '12px' }}>
+                    Detected: <strong>{formSchemas[template.detectedFormType]?.name[language]}</strong>
+                  </span>
+                </div>
+                {template.allMatches.length > 1 && (
+                  <div style={{ fontSize: '14px', color: '#6c757d' }}>
+                    Other possible matches:
+                    <ul style={{ margin: '8px 0', paddingLeft: '20px' }}>
+                      {template.allMatches.slice(1, 4).map(match => (
+                        <li key={match.formId}>
+                          {formSchemas[match.formId]?.name[language]} ({match.percentage}%)
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div style={{ color: '#dc3545' }}>
+                Could not auto-detect form type. Please select manually.
+              </div>
+            )}
+          </div>
+
+          {/* Manual Selection */}
+          <div style={styles.section}>
+            <h3 style={styles.sectionTitle}>Select Form Type (Manual Override)</h3>
+            <select
+              style={styles.select}
+              value={template.selectedFormType}
+              onChange={(e) => setCurrentPendingTemplate(prev => ({
+                ...prev,
+                selectedFormType: e.target.value
+              }))}
+            >
+              <option value="">-- Select Form Type --</option>
+              {Object.entries(formSchemas).map(([key, form]) => (
+                <option key={key} value={key}>
+                  {form.name[language]}
+                  {template.allMatches.find(m => m.formId === key)
+                    ? ` (${template.allMatches.find(m => m.formId === key).percentage}% match)`
+                    : ''
+                  }
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Field List (collapsible) */}
+          <details style={{ marginBottom: '20px' }}>
+            <summary style={{ cursor: 'pointer', fontWeight: '600', marginBottom: '12px' }}>
+              View PDF Fields ({template.fieldCount} fields)
+            </summary>
+            <div style={{
+              maxHeight: '200px',
+              overflow: 'auto',
+              background: '#f8f9fa',
+              padding: '12px',
+              borderRadius: '8px',
+              fontSize: '12px',
+              fontFamily: 'monospace'
+            }}>
+              {template.fields.map((field, idx) => (
+                <div key={idx} style={{ marginBottom: '4px' }}>
+                  <span style={{ color: '#667eea' }}>{field.type}</span>: {field.name}
+                </div>
+              ))}
+            </div>
+          </details>
+
+          {/* Actions */}
+          <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+            <button
+              style={{ ...styles.button, ...styles.secondaryButton }}
+              onClick={() => rejectTemplate(template.id)}
+            >
+              Reject
+            </button>
+            <button
+              style={{
+                ...styles.button,
+                ...styles.successButton,
+                ...((!template.selectedFormType) ? styles.disabledButton : {})
+              }}
+              onClick={() => approveTemplate(template.id, template.selectedFormType)}
+              disabled={!template.selectedFormType}
+            >
+              Approve & Add to Workflow
+            </button>
+          </div>
+        </div>
+      </div>
+    );
   };
 
   const downloadPDF = () => {
@@ -2407,6 +2671,54 @@ export default function AMSTranscriptionSuite() {
       <h2 style={styles.stepTitle}>{t('pdfTitle')}</h2>
       <p style={styles.stepDescription}>{t('pdfDescription')}</p>
 
+      {/* Upload Custom PDF Template Section */}
+      <div style={{ ...styles.section, background: 'linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%)', border: '2px dashed #667eea' }}>
+        <h3 style={styles.sectionTitle}>
+          {language === 'en' ? 'Upload Custom PDF Template' : 'Télécharger un Modèle PDF Personnalisé'}
+        </h3>
+        <p style={{ fontSize: '14px', color: '#4c51bf', marginBottom: '16px' }}>
+          {language === 'en'
+            ? 'Upload a fillable PDF form. AI will auto-detect the form type and extract fields. Requires your approval before use.'
+            : 'Téléchargez un formulaire PDF remplissable. L\'IA détectera automatiquement le type et extraira les champs. Nécessite votre approbation.'
+          }
+        </p>
+
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
+          <label style={{ ...styles.button, ...styles.primaryButton, cursor: 'pointer' }}>
+            <input
+              type="file"
+              accept="application/pdf"
+              onChange={handleTemplateUpload}
+              style={{ display: 'none' }}
+            />
+            {language === 'en' ? 'Choose PDF Template' : 'Choisir un Modèle PDF'}
+          </label>
+
+          {pendingTemplates.filter(t => t.status === 'pending_approval').length > 0 && (
+            <span style={styles.badge('warning')}>
+              {pendingTemplates.filter(t => t.status === 'pending_approval').length} pending approval
+            </span>
+          )}
+        </div>
+
+        {/* Show loaded templates */}
+        {Object.keys(pdfTemplates).length > 0 && (
+          <div style={{ marginTop: '16px' }}>
+            <strong style={{ fontSize: '14px' }}>
+              {language === 'en' ? 'Loaded Templates:' : 'Modèles Chargés:'}
+            </strong>
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '8px' }}>
+              {Object.entries(pdfTemplates).map(([formId, template]) => (
+                <span key={formId} style={{ ...styles.badge('success'), fontSize: '11px' }}>
+                  {formSchemas[formId]?.name[language] || formId}: {template.fields.length} fields
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* PDF Settings */}
       <div style={styles.section}>
         <h3 style={styles.sectionTitle}>{t('pdfSettings')}</h3>
 
@@ -2452,12 +2764,26 @@ export default function AMSTranscriptionSuite() {
         </div>
       </div>
 
+      {/* Selected Form Info */}
+      <div style={{ ...styles.alert('info'), marginTop: '16px' }}>
+        <strong>{language === 'en' ? 'Selected Form:' : 'Formulaire Sélectionné:'}</strong>{' '}
+        {formSchemas[selectedForm]?.name[language] || selectedForm}
+        {pdfTemplates[selectedForm] && (
+          <span style={{ marginLeft: '12px', ...styles.badge('success') }}>
+            Template loaded ({pdfTemplates[selectedForm].fields.length} fields)
+          </span>
+        )}
+      </div>
+
       <div style={{ display: 'flex', gap: '12px', marginTop: '24px', flexWrap: 'wrap' }}>
         <button
           style={{ ...styles.button, ...styles.primaryButton }}
           onClick={generatePDF}
         >
-          {t('generatePdf')}
+          {pdfTemplates[selectedForm]
+            ? (language === 'en' ? 'Fill PDF Template' : 'Remplir le Modèle PDF')
+            : t('generatePdf')
+          }
         </button>
 
         {pdfData.generated && (
@@ -2481,7 +2807,10 @@ export default function AMSTranscriptionSuite() {
 
       {pdfData.generated && (
         <div style={{ ...styles.alert('success'), marginTop: '24px' }}>
-          ✓ PDF generated successfully and ready for download
+          {pdfTemplates[selectedForm]
+            ? (language === 'en' ? '✓ PDF form fields filled successfully' : '✓ Champs du formulaire PDF remplis avec succès')
+            : '✓ PDF generated successfully and ready for download'
+          }
         </div>
       )}
     </div>
@@ -2724,6 +3053,7 @@ export default function AMSTranscriptionSuite() {
       {renderAlerts()}
       {isLocked && renderLockScreen()}
       {showTimeoutWarning && !isLocked && renderTimeoutWarning()}
+      {renderTemplateApprovalModal()}
 
       <div style={styles.card}>
         <header style={styles.header}>

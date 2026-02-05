@@ -1622,72 +1622,182 @@ export default function AMSTranscriptionSuite() {
   };
 
   // Fill PDF form fields from existing template
+  // Fill ACTUAL PDF form fields from the uploaded PDF - iterates through real fields
   const fillPdfFormFields = async (pdfDoc, schema, formData) => {
     try {
       const form = pdfDoc.getForm();
-      const fields = form.getFields();
+      const pdfFields = form.getFields();
 
-      // Log available fields for debugging
-      console.log('Available PDF fields:', fields.map(f => f.getName()));
+      // Log ACTUAL fields in the PDF
+      console.log('=== ACTUAL PDF FIELDS IN UPLOADED FILE ===');
+      pdfFields.forEach(f => console.log(`  ${f.constructor.name}: "${f.getName()}"`));
+      console.log(`  Total: ${pdfFields.length} fields`);
 
-      // Iterate through schema sections and fields
-      schema.sections.forEach(section => {
-        section.fields.forEach(fieldDef => {
-          const value = formData[fieldDef.id];
-          if (value === undefined || value === null || value === '') return;
+      // Build comprehensive data map from all sources
+      const allData = { ...formData };
 
-          const pdfFieldName = fieldDef.pdfField;
-          if (!pdfFieldName) return;
+      // Add patient info with multiple naming variations
+      const patientMappings = [
+        // Patient Name variations
+        ['patientName', consentData.patientName],
+        ['Patient Name', consentData.patientName],
+        ['patient_name', consentData.patientName],
+        ['PatientName', consentData.patientName],
+        ['Name', consentData.patientName],
+        ['name', consentData.patientName],
+        // DOB variations
+        ['dob', consentData.dateOfBirth],
+        ['DOB', consentData.dateOfBirth],
+        ['Date of Birth', consentData.dateOfBirth],
+        ['date_of_birth', consentData.dateOfBirth],
+        ['DateOfBirth', consentData.dateOfBirth],
+        ['Birth Date', consentData.dateOfBirth],
+        ['birthdate', consentData.dateOfBirth],
+        // Patient ID variations
+        ['patientId', consentData.patientId],
+        ['Patient ID', consentData.patientId],
+        ['patient_id', consentData.patientId],
+        ['PatientID', consentData.patientId],
+        ['ID', consentData.patientId],
+        ['Chart', consentData.patientId],
+        ['Chart Number', consentData.patientId],
+        ['MRN', consentData.patientId],
+        // Visit Date variations
+        ['visitDate', new Date().toISOString().split('T')[0]],
+        ['Visit Date', new Date().toISOString().split('T')[0]],
+        ['visit_date', new Date().toISOString().split('T')[0]],
+        ['VisitDate', new Date().toISOString().split('T')[0]],
+        ['Date', new Date().toISOString().split('T')[0]],
+        ['Exam Date', new Date().toISOString().split('T')[0]],
+        ['Assessment Date', new Date().toISOString().split('T')[0]],
+      ];
 
-          try {
-            // Handle different field types
-            if (fieldDef.type === 'checkbox') {
-              const checkBox = form.getCheckBox(pdfFieldName);
-              if (value === true || value === 'true' || value === 'on') {
+      patientMappings.forEach(([key, value]) => {
+        if (value) allData[key] = value;
+      });
+
+      // Add schema pdfField mappings if schema exists
+      if (schema && schema.sections) {
+        schema.sections.forEach(section => {
+          section.fields.forEach(fieldDef => {
+            const value = formData[fieldDef.id];
+            if (value !== undefined && value !== null && value !== '') {
+              // Add both the field id and pdfField name
+              if (fieldDef.pdfField) {
+                allData[fieldDef.pdfField] = value;
+              }
+            }
+          });
+        });
+      }
+
+      // Normalize function for fuzzy matching
+      const normalize = (str) => str.toLowerCase().replace(/[\s_\-\.]/g, '').replace(/[^a-z0-9]/g, '');
+
+      // Create normalized lookup
+      const normalizedData = {};
+      Object.entries(allData).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          normalizedData[normalize(key)] = value;
+          normalizedData[key] = value; // Keep original too
+        }
+      });
+
+      console.log('=== DATA AVAILABLE FOR FILLING ===');
+      console.log(Object.keys(allData).filter(k => allData[k]));
+
+      // ITERATE THROUGH ACTUAL PDF FIELDS AND FILL THEM
+      let filledCount = 0;
+      let skippedCount = 0;
+
+      for (const pdfField of pdfFields) {
+        const fieldName = pdfField.getName();
+        const fieldType = pdfField.constructor.name;
+        const normalizedFieldName = normalize(fieldName);
+
+        // Find matching value - try exact match first, then normalized
+        let value = allData[fieldName] ?? normalizedData[normalizedFieldName];
+
+        // If no match, try partial/fuzzy matching
+        if (value === undefined) {
+          for (const [dataKey, dataValue] of Object.entries(normalizedData)) {
+            const normalizedDataKey = normalize(dataKey);
+            if (normalizedFieldName.includes(normalizedDataKey) ||
+                normalizedDataKey.includes(normalizedFieldName) ||
+                normalizedFieldName === normalizedDataKey) {
+              value = dataValue;
+              break;
+            }
+          }
+        }
+
+        if (value === undefined || value === null || value === '') {
+          skippedCount++;
+          continue;
+        }
+
+        try {
+          switch (fieldType) {
+            case 'PDFCheckBox':
+              const checkBox = form.getCheckBox(fieldName);
+              const isChecked = value === true || value === 'true' || value === 'on' ||
+                               value === 'yes' || value === 'Yes' || value === '1' || value === 1;
+              if (isChecked) {
                 checkBox.check();
               } else {
                 checkBox.uncheck();
               }
-            } else if (fieldDef.type === 'select') {
-              // Try dropdown first, fall back to text field
-              try {
-                const dropdown = form.getDropdown(pdfFieldName);
-                dropdown.select(value);
-              } catch {
-                const textField = form.getTextField(pdfFieldName);
-                textField.setText(String(value));
+              filledCount++;
+              console.log(`  ✓ CheckBox "${fieldName}" = ${isChecked}`);
+              break;
+
+            case 'PDFDropdown':
+              const dropdown = form.getDropdown(fieldName);
+              const options = dropdown.getOptions();
+              // Try to find matching option
+              const matchingOption = options.find(opt =>
+                opt.toLowerCase() === String(value).toLowerCase() ||
+                normalize(opt) === normalize(String(value))
+              );
+              if (matchingOption) {
+                dropdown.select(matchingOption);
+                filledCount++;
+                console.log(`  ✓ Dropdown "${fieldName}" = ${matchingOption}`);
+              } else {
+                console.warn(`  ⚠ Dropdown "${fieldName}": "${value}" not in options [${options.join(', ')}]`);
               }
-            } else {
-              // Text, textarea, date, number - all go to text fields
-              const textField = form.getTextField(pdfFieldName);
+              break;
+
+            case 'PDFRadioGroup':
+              const radioGroup = form.getRadioGroup(fieldName);
+              const radioOptions = radioGroup.getOptions();
+              const matchingRadio = radioOptions.find(opt =>
+                opt.toLowerCase() === String(value).toLowerCase() ||
+                normalize(opt) === normalize(String(value))
+              );
+              if (matchingRadio) {
+                radioGroup.select(matchingRadio);
+                filledCount++;
+                console.log(`  ✓ RadioGroup "${fieldName}" = ${matchingRadio}`);
+              }
+              break;
+
+            case 'PDFTextField':
+            default:
+              const textField = form.getTextField(fieldName);
               textField.setText(String(value));
-            }
-          } catch (fieldError) {
-            console.warn(`Could not fill field "${pdfFieldName}":`, fieldError.message);
+              filledCount++;
+              console.log(`  ✓ TextField "${fieldName}" = ${String(value).substring(0, 50)}...`);
+              break;
           }
-        });
-      });
-
-      // Add patient info from consent
-      const patientFields = {
-        'Patient Name': consentData.patientName,
-        'Date of Birth': consentData.dateOfBirth,
-        'Patient ID': consentData.patientId,
-        'Visit Date': new Date().toISOString().split('T')[0]
-      };
-
-      Object.entries(patientFields).forEach(([fieldName, value]) => {
-        if (!value) return;
-        try {
-          const textField = form.getTextField(fieldName);
-          textField.setText(String(value));
-        } catch {
-          // Field doesn't exist, skip
+        } catch (fieldError) {
+          console.warn(`  ✗ Error filling "${fieldName}":`, fieldError.message);
         }
-      });
+      }
 
-      // Flatten form to make fields non-editable (optional)
-      // form.flatten();
+      console.log(`=== RESULT: Filled ${filledCount}/${pdfFields.length} fields (${skippedCount} skipped - no data) ===`);
+
+      return filledCount;
 
     } catch (error) {
       console.error('Error filling form fields:', error);

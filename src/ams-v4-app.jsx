@@ -574,7 +574,7 @@ const formSchemas = {
   mckenzieLumbar: {
     id: 'mckenzieLumbar',
     name: { en: 'McKenzie Lumbar Assessment', fr: 'Évaluation McKenzie Lombaire' },
-    pdfTemplate: '/forms/mckenzie-lumbar.pdf',
+    pdfTemplate: '/forms/mckenzie lumbar fielded.pdf',
     sections: [
       {
         title: { en: 'Patient Information', fr: 'Information du Patient' },
@@ -641,7 +641,7 @@ const formSchemas = {
   mckenzieCervical: {
     id: 'mckenzieCervical',
     name: { en: 'McKenzie Cervical Assessment', fr: 'Évaluation McKenzie Cervicale' },
-    pdfTemplate: '/forms/mckenzie-cervical.pdf',
+    pdfTemplate: '/forms/mckenzie Cervical PDF Fielded.pdf',
     sections: [
       {
         title: { en: 'Patient Information', fr: 'Information du Patient' },
@@ -695,7 +695,7 @@ const formSchemas = {
   mckenzieThoracic: {
     id: 'mckenzieThoracic',
     name: { en: 'McKenzie Thoracic Assessment', fr: 'Évaluation McKenzie Thoracique' },
-    pdfTemplate: '/forms/mckenzie-thoracic.pdf',
+    pdfTemplate: '/forms/thoracic pdf labeled done.pdf',
     sections: [
       {
         title: { en: 'Patient Information', fr: 'Information du Patient' },
@@ -741,7 +741,7 @@ const formSchemas = {
   mckenzieUpperExtremity: {
     id: 'mckenzieUpperExtremity',
     name: { en: 'McKenzie Upper Extremity Assessment', fr: 'Évaluation McKenzie Membre Supérieur' },
-    pdfTemplate: '/forms/mckenzie-upper-extremity.pdf',
+    pdfTemplate: '/forms/Mckenzie Upper-Extremeties Fielded.pdf',
     sections: [
       {
         title: { en: 'Patient Information', fr: 'Information du Patient' },
@@ -787,7 +787,7 @@ const formSchemas = {
   mckenzieLowerExtremity: {
     id: 'mckenzieLowerExtremity',
     name: { en: 'McKenzie Lower Extremity Assessment', fr: 'Évaluation McKenzie Membre Inférieur' },
-    pdfTemplate: '/forms/mckenzie-lower-extremity.pdf',
+    pdfTemplate: '/forms/Mckenzie Lower-Extremities Fielded.pdf',
     sections: [
       {
         title: { en: 'Patient Information', fr: 'Information du Patient' },
@@ -835,7 +835,7 @@ const formSchemas = {
   hipAssessment: {
     id: 'hipAssessment',
     name: { en: 'Hip Assessment', fr: 'Évaluation de la Hanche' },
-    pdfTemplate: '/forms/hip-assessment.pdf',
+    pdfTemplate: '/forms/Hip eval completed.pdf',
     sections: [
       {
         title: { en: 'Patient Information', fr: 'Information du Patient' },
@@ -900,7 +900,7 @@ const formSchemas = {
   kneeAssessment: {
     id: 'kneeAssessment',
     name: { en: 'Knee Assessment', fr: 'Évaluation du Genou' },
-    pdfTemplate: '/forms/knee-assessment.pdf',
+    pdfTemplate: '/forms/Knee evaluation completed (1).pdf',
     sections: [
       {
         title: { en: 'Patient Information', fr: 'Information du Patient' },
@@ -966,7 +966,7 @@ const formSchemas = {
   shoulderAssessment: {
     id: 'shoulderAssessment',
     name: { en: 'Shoulder Assessment', fr: 'Évaluation de l\'Épaule' },
-    pdfTemplate: '/forms/shoulder-assessment.pdf',
+    pdfTemplate: '/forms/Shoulder evaluation completed.pdf',
     sections: [
       {
         title: { en: 'Patient Information', fr: 'Information du Patient' },
@@ -1023,7 +1023,7 @@ const formSchemas = {
   ankleAssessment: {
     id: 'ankleAssessment',
     name: { en: 'Ankle Assessment', fr: 'Évaluation de la Cheville' },
-    pdfTemplate: '/forms/ankle-assessment.pdf',
+    pdfTemplate: '/forms/Ankle evaluation pdf-completed.pdf',
     sections: [
       {
         title: { en: 'Patient Information', fr: 'Information du Patient' },
@@ -1076,7 +1076,7 @@ const formSchemas = {
   wristAssessment: {
     id: 'wristAssessment',
     name: { en: 'Wrist Assessment', fr: 'Évaluation du Poignet' },
-    pdfTemplate: '/forms/wrist-assessment.pdf',
+    pdfTemplate: '/forms/wrist eval_complete (2).pdf',
     sections: [
       {
         title: { en: 'Patient Information', fr: 'Information du Patient' },
@@ -1186,7 +1186,7 @@ const formSchemas = {
   bergBalance: {
     id: 'bergBalance',
     name: { en: 'Berg Balance Scale', fr: 'Échelle d\'Équilibre de Berg' },
-    pdfTemplate: '/forms/berg-balance.pdf',
+    pdfTemplate: '/forms/BERG Balance evaluation completed.pdf',
     sections: [
       {
         title: { en: 'Patient Information', fr: 'Information du Patient' },

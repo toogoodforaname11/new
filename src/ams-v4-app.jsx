@@ -329,6 +329,14 @@ const Icons = {
       <line x1="2" y1="12" x2="22" y2="12" />
       <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
     </Icon>
+  ),
+
+  // Book / How It Works
+  Book: ({ size = 16, style }) => (
+    <Icon size={size} style={style}>
+      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" />
+      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" />
+    </Icon>
   )
 };
 
@@ -343,7 +351,7 @@ const translations = {
     // Steps
     step1: 'Consent',
     step2: 'Record',
-    step3: 'Notes',
+    step3: 'Notes → PDF',
     step4: 'PDF',
     step5: 'Bundle',
 
@@ -375,8 +383,8 @@ const translations = {
     qualityPoor: 'Poor',
 
     // Notes Step
-    notesTitle: 'Clinical Notes',
-    notesDescription: 'Review and edit transcribed notes',
+    notesTitle: 'Clinical Notes & PDF Population',
+    notesDescription: 'Review and edit transcribed notes — these fields directly populate your selected PDF template',
     transcription: 'Transcription',
     clinicalSummary: 'Clinical Summary',
     diagnosis: 'Diagnosis',
@@ -420,7 +428,7 @@ const translations = {
     extendSession: 'Extend Session',
     logout: 'Logout',
     locked: 'Session Locked',
-    enterPin: 'Enter PIN to unlock',
+    enterPin: 'Recurring autolock — 2 min compliance function',
     unlock: 'Unlock',
 
     // Common
@@ -456,7 +464,7 @@ const translations = {
     // Steps
     step1: 'Consentement',
     step2: 'Enregistrement',
-    step3: 'Notes',
+    step3: 'Notes → PDF',
     step4: 'PDF',
     step5: 'Dossier',
 
@@ -488,8 +496,8 @@ const translations = {
     qualityPoor: 'Mauvaise',
 
     // Notes Step
-    notesTitle: 'Notes Cliniques',
-    notesDescription: 'Réviser et modifier les notes transcrites',
+    notesTitle: 'Notes Cliniques & Population PDF',
+    notesDescription: 'Réviser et modifier les notes transcrites — ces champs remplissent directement votre modèle PDF sélectionné',
     transcription: 'Transcription',
     clinicalSummary: 'Résumé Clinique',
     diagnosis: 'Diagnostic',
@@ -533,7 +541,7 @@ const translations = {
     extendSession: 'Prolonger la Session',
     logout: 'Déconnexion',
     locked: 'Session Verrouillée',
-    enterPin: 'Entrez le NIP pour déverrouiller',
+    enterPin: 'Verrouillage automatique récurrent — fonction de conformité 2 min',
     unlock: 'Déverrouiller',
 
     // Common
@@ -1376,302 +1384,451 @@ const formSchemas = {
 // ============================================================================
 // STYLES
 // ============================================================================
+// ============================================================================
+// AMS CLINIC BRAND TOKENS
+// Extracted from amsclinic.ca - Official brand colors and typography
+// ============================================================================
+const brand = {
+  blue:       '#0075b7',    // Primary brand blue
+  blueDark:   '#005a8e',    // Hover / dark variant
+  blueLight:  '#e8f4fb',    // Light blue tints
+  blueMid:    '#0c71c3',    // Secondary blue (headers)
+  orange:     '#ff8a00',    // CTA / accent orange
+  orangeDark: '#e67a00',    // Orange hover
+  orangeLight:'#fff7eb',    // Light orange tint
+  white:      '#ffffff',
+  offWhite:   '#f4f4f4',    // Page background
+  gray50:     '#f8f9fa',
+  gray100:    '#f0f0f4',
+  gray200:    '#e9ecef',
+  gray300:    '#dee2e6',
+  gray400:    '#aaaaaa',
+  gray600:    '#666666',
+  gray800:    '#333333',
+  gray900:    '#222222',
+  success:    '#16a34a',
+  successBg:  '#f0fdf4',
+  successBdr: '#bbf7d0',
+  danger:     '#dc2626',
+  dangerBg:   '#fef2f2',
+  dangerBdr:  '#fecaca',
+  warningBg:  '#fffbeb',
+  warningBdr: '#fed7aa',
+  warningText:'#92400e',
+  fontHeading:"'Ubuntu', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+  fontBody:   "'Open Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+  radius:     '6px',
+  radiusMd:   '8px',
+  radiusLg:   '12px',
+  shadow:     '0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06)',
+  shadowMd:   '0 4px 12px rgba(0,0,0,0.08)',
+  shadowLg:   '0 10px 40px rgba(0,0,0,0.1)',
+};
+
 const styles = {
+  // ---- LAYOUT ----
   container: {
     minHeight: '100vh',
-    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-    padding: '20px',
-    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif'
+    background: brand.offWhite,
+    fontFamily: brand.fontBody,
+    color: brand.gray900,
   },
-  card: {
-    background: 'white',
-    borderRadius: '16px',
-    boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
-    maxWidth: '1200px',
-    margin: '0 auto',
-    overflow: 'hidden'
+  topBar: {
+    background: brand.blue,
+    padding: '0',
+    position: 'sticky',
+    top: 0,
+    zIndex: 100,
+    boxShadow: '0 2px 8px rgba(0,117,183,0.25)',
   },
-  header: {
-    background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)',
-    color: 'white',
-    padding: '24px 32px',
+  topBarInner: {
     display: 'flex',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    flexWrap: 'wrap',
-    gap: '16px'
+    justifyContent: 'space-between',
+    padding: '0 24px',
+    height: '68px',
   },
-  title: {
-    fontSize: '24px',
+  logoArea: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: '14px',
+  },
+  logoText: {
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  logoTitle: {
+    fontFamily: brand.fontHeading,
+    fontSize: '18px',
     fontWeight: '700',
-    margin: 0
+    color: brand.white,
+    lineHeight: '1.1',
+    letterSpacing: '-0.3px',
   },
-  subtitle: {
-    fontSize: '14px',
-    opacity: 0.8,
-    marginTop: '4px'
+  logoSubtitle: {
+    fontFamily: brand.fontBody,
+    fontSize: '11px',
+    fontWeight: '400',
+    color: 'rgba(255,255,255,0.75)',
+    letterSpacing: '0.5px',
+    textTransform: 'uppercase',
+    marginTop: '2px',
   },
   headerControls: {
     display: 'flex',
-    gap: '12px',
-    alignItems: 'center'
+    gap: '8px',
+    alignItems: 'center',
   },
-  langToggle: {
-    background: 'rgba(255,255,255,0.1)',
-    border: '1px solid rgba(255,255,255,0.2)',
-    borderRadius: '8px',
-    padding: '8px 16px',
-    color: 'white',
+  headerBtn: {
+    background: 'rgba(255,255,255,0.12)',
+    border: '1px solid rgba(255,255,255,0.25)',
+    borderRadius: brand.radius,
+    padding: '7px 14px',
+    color: brand.white,
     cursor: 'pointer',
-    fontSize: '14px',
+    fontSize: '13px',
     fontWeight: '600',
-    transition: 'all 0.2s ease'
+    transition: 'all 0.15s ease',
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '5px',
+    fontFamily: brand.fontBody,
   },
+  headerBtnDanger: {
+    background: 'rgba(220,38,38,0.15)',
+    borderColor: 'rgba(220,38,38,0.35)',
+  },
+  // ---- MAIN CONTENT AREA ----
+  mainWrap: {
+    maxWidth: '1180px',
+    margin: '0 auto',
+    padding: '28px 24px 48px',
+  },
+  card: {
+    background: brand.white,
+    borderRadius: brand.radiusLg,
+    boxShadow: brand.shadowMd,
+    overflow: 'hidden',
+    border: `1px solid ${brand.gray200}`,
+  },
+  // ---- PROGRESS BAR ----
   progressBar: {
     display: 'flex',
-    justifyContent: 'space-between',
-    padding: '20px 32px',
-    background: '#f8f9fa',
-    borderBottom: '1px solid #e9ecef'
+    alignItems: 'center',
+    padding: '0',
+    background: brand.white,
+    borderBottom: `1px solid ${brand.gray200}`,
   },
   progressStep: {
     display: 'flex',
-    flexDirection: 'column',
     alignItems: 'center',
+    justifyContent: 'center',
     flex: 1,
-    position: 'relative'
+    position: 'relative',
+    padding: '18px 8px',
+    gap: '10px',
+    cursor: 'default',
   },
   progressCircle: (active, completed) => ({
-    width: '40px',
-    height: '40px',
+    width: '32px',
+    height: '32px',
+    minWidth: '32px',
     borderRadius: '50%',
-    background: completed ? '#28a745' : active ? '#667eea' : '#dee2e6',
-    color: 'white',
+    background: completed ? brand.success : active ? brand.blue : brand.gray200,
+    color: completed || active ? brand.white : brand.gray600,
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    fontWeight: '600',
-    fontSize: '14px',
-    transition: 'all 0.3s ease',
-    boxShadow: active ? '0 0 0 4px rgba(102, 126, 234, 0.3)' : 'none'
+    fontWeight: '700',
+    fontSize: '13px',
+    fontFamily: brand.fontHeading,
+    transition: 'all 0.25s ease',
+    boxShadow: active ? `0 0 0 3px ${brand.blueLight}` : 'none',
   }),
   progressLabel: (active) => ({
-    marginTop: '8px',
-    fontSize: '12px',
-    fontWeight: active ? '600' : '400',
-    color: active ? '#667eea' : '#6c757d'
+    fontSize: '13px',
+    fontWeight: active ? '600' : '500',
+    color: active ? brand.blue : brand.gray600,
+    fontFamily: brand.fontHeading,
+    whiteSpace: 'nowrap',
   }),
+  progressDivider: {
+    width: '1px',
+    height: '32px',
+    background: brand.gray200,
+    flexShrink: 0,
+  },
+  // ---- CONTENT AREA ----
   content: {
-    padding: '32px'
+    padding: '36px 40px 40px',
   },
   stepTitle: {
-    fontSize: '28px',
+    fontFamily: brand.fontHeading,
+    fontSize: '24px',
     fontWeight: '700',
-    color: '#1a1a2e',
-    marginBottom: '8px'
+    color: brand.blue,
+    marginBottom: '6px',
+    lineHeight: '1.2',
   },
   stepDescription: {
-    fontSize: '16px',
-    color: '#6c757d',
-    marginBottom: '32px'
+    fontSize: '14px',
+    color: brand.gray600,
+    marginBottom: '28px',
+    lineHeight: '1.5',
   },
+  // ---- FORMS ----
   formGrid: {
     display: 'grid',
-    gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-    gap: '24px'
+    gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+    gap: '20px',
   },
   formGroup: {
-    marginBottom: '20px'
+    marginBottom: '18px',
   },
   label: {
     display: 'block',
-    marginBottom: '8px',
+    marginBottom: '6px',
     fontWeight: '600',
-    color: '#333',
-    fontSize: '14px'
+    color: brand.gray800,
+    fontSize: '13px',
+    letterSpacing: '0.1px',
   },
   input: {
     width: '100%',
-    padding: '12px 16px',
-    border: '2px solid #e9ecef',
-    borderRadius: '8px',
+    padding: '10px 14px',
+    border: `1.5px solid ${brand.gray200}`,
+    borderRadius: brand.radius,
     fontSize: '14px',
-    transition: 'border-color 0.2s ease',
+    transition: 'border-color 0.15s ease, box-shadow 0.15s ease',
     outline: 'none',
-    boxSizing: 'border-box'
-  },
-  inputFocus: {
-    borderColor: '#667eea'
+    boxSizing: 'border-box',
+    background: brand.white,
+    color: brand.gray900,
   },
   textarea: {
     width: '100%',
-    padding: '12px 16px',
-    border: '2px solid #e9ecef',
-    borderRadius: '8px',
+    padding: '10px 14px',
+    border: `1.5px solid ${brand.gray200}`,
+    borderRadius: brand.radius,
     fontSize: '14px',
-    minHeight: '120px',
+    minHeight: '110px',
     resize: 'vertical',
     outline: 'none',
     boxSizing: 'border-box',
-    fontFamily: 'inherit'
+    fontFamily: 'inherit',
+    background: brand.white,
+    color: brand.gray900,
+    lineHeight: '1.5',
   },
   select: {
     width: '100%',
-    padding: '12px 16px',
-    border: '2px solid #e9ecef',
-    borderRadius: '8px',
+    padding: '10px 14px',
+    border: `1.5px solid ${brand.gray200}`,
+    borderRadius: brand.radius,
     fontSize: '14px',
     outline: 'none',
-    background: 'white',
-    cursor: 'pointer'
+    background: brand.white,
+    cursor: 'pointer',
+    color: brand.gray900,
+    appearance: 'auto',
   },
   checkbox: {
     display: 'flex',
     alignItems: 'center',
-    gap: '12px',
-    cursor: 'pointer'
+    gap: '10px',
+    cursor: 'pointer',
   },
   checkboxInput: {
-    width: '20px',
-    height: '20px',
-    cursor: 'pointer'
+    width: '18px',
+    height: '18px',
+    cursor: 'pointer',
+    accentColor: brand.blue,
   },
+  // ---- BUTTONS ----
   button: {
-    padding: '14px 28px',
-    borderRadius: '8px',
+    padding: '10px 22px',
+    borderRadius: brand.radius,
     border: 'none',
     fontWeight: '600',
-    fontSize: '14px',
+    fontSize: '13px',
     cursor: 'pointer',
-    transition: 'all 0.2s ease',
+    transition: 'all 0.15s ease',
     display: 'inline-flex',
     alignItems: 'center',
-    gap: '8px'
+    gap: '7px',
+    fontFamily: brand.fontBody,
+    letterSpacing: '0.2px',
+    textTransform: 'uppercase',
+    lineHeight: '1',
   },
   primaryButton: {
-    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-    color: 'white'
+    background: brand.orange,
+    color: brand.white,
+    boxShadow: '0 1px 3px rgba(255,138,0,0.3)',
   },
   secondaryButton: {
-    background: '#f8f9fa',
-    color: '#333',
-    border: '2px solid #e9ecef'
+    background: brand.white,
+    color: brand.gray800,
+    border: `1.5px solid ${brand.gray200}`,
+    boxShadow: brand.shadow,
   },
   successButton: {
-    background: '#28a745',
-    color: 'white'
+    background: brand.success,
+    color: brand.white,
+    boxShadow: '0 1px 3px rgba(22,163,74,0.3)',
   },
   dangerButton: {
-    background: '#dc3545',
-    color: 'white'
+    background: brand.danger,
+    color: brand.white,
+    boxShadow: '0 1px 3px rgba(220,38,38,0.3)',
+  },
+  blueButton: {
+    background: brand.blue,
+    color: brand.white,
+    boxShadow: '0 1px 3px rgba(0,117,183,0.3)',
   },
   disabledButton: {
-    opacity: 0.5,
-    cursor: 'not-allowed'
+    opacity: 0.45,
+    cursor: 'not-allowed',
+    boxShadow: 'none',
   },
   buttonGroup: {
     display: 'flex',
     gap: '12px',
     justifyContent: 'space-between',
-    marginTop: '32px',
-    flexWrap: 'wrap'
+    marginTop: '36px',
+    paddingTop: '24px',
+    borderTop: `1px solid ${brand.gray200}`,
   },
+  // ---- ALERTS / TOASTS ----
   alert: (type) => ({
-    padding: '16px 20px',
-    borderRadius: '8px',
-    marginBottom: '20px',
+    padding: '14px 18px',
+    borderRadius: brand.radiusMd,
+    marginBottom: '16px',
     display: 'flex',
     alignItems: 'center',
-    gap: '12px',
-    background: type === 'success' ? '#d4edda' : type === 'error' ? '#f8d7da' : type === 'warning' ? '#fff3cd' : '#cce5ff',
-    color: type === 'success' ? '#155724' : type === 'error' ? '#721c24' : type === 'warning' ? '#856404' : '#004085',
-    border: `1px solid ${type === 'success' ? '#c3e6cb' : type === 'error' ? '#f5c6cb' : type === 'warning' ? '#ffeeba' : '#b8daff'}`
+    gap: '10px',
+    fontSize: '13px',
+    fontWeight: '500',
+    background: type === 'success' ? brand.successBg : type === 'error' ? brand.dangerBg : type === 'warning' ? brand.warningBg : brand.blueLight,
+    color: type === 'success' ? '#166534' : type === 'error' ? '#991b1b' : type === 'warning' ? brand.warningText : '#075985',
+    border: `1px solid ${type === 'success' ? brand.successBdr : type === 'error' ? brand.dangerBdr : type === 'warning' ? brand.warningBdr : '#bae6fd'}`,
   }),
+  // ---- MODALS ----
   modal: {
     position: 'fixed',
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
-    background: 'rgba(0,0,0,0.7)',
+    background: 'rgba(0,30,60,0.6)',
+    backdropFilter: 'blur(4px)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     zIndex: 1000,
-    padding: '20px'
+    padding: '20px',
   },
   modalContent: {
-    background: 'white',
-    borderRadius: '16px',
-    padding: '32px',
-    maxWidth: '500px',
+    background: brand.white,
+    borderRadius: brand.radiusLg,
+    padding: '36px',
+    maxWidth: '460px',
     width: '100%',
     maxHeight: '90vh',
-    overflow: 'auto'
+    overflow: 'auto',
+    boxShadow: '0 20px 60px rgba(0,30,60,0.25)',
+    border: `1px solid ${brand.gray200}`,
   },
   modalTitle: {
-    fontSize: '24px',
+    fontFamily: brand.fontHeading,
+    fontSize: '22px',
     fontWeight: '700',
-    marginBottom: '16px',
-    color: '#1a1a2e'
+    marginBottom: '12px',
+    color: brand.blue,
   },
+  // ---- SECTIONS ----
   section: {
-    background: '#f8f9fa',
-    borderRadius: '12px',
-    padding: '24px',
-    marginBottom: '24px'
+    background: brand.gray50,
+    borderRadius: brand.radiusMd,
+    padding: '22px 24px',
+    marginBottom: '20px',
+    border: `1px solid ${brand.gray200}`,
   },
   sectionTitle: {
-    fontSize: '18px',
+    fontFamily: brand.fontHeading,
+    fontSize: '16px',
     fontWeight: '600',
-    color: '#1a1a2e',
-    marginBottom: '16px',
-    paddingBottom: '12px',
-    borderBottom: '2px solid #e9ecef'
+    color: brand.blue,
+    marginBottom: '14px',
+    paddingBottom: '10px',
+    borderBottom: `2px solid ${brand.orange}`,
+    display: 'flex',
+    alignItems: 'center',
   },
+  // ---- BADGES ----
   badge: (type) => ({
     display: 'inline-flex',
     alignItems: 'center',
-    padding: '4px 12px',
+    gap: '4px',
+    padding: '3px 10px',
     borderRadius: '20px',
-    fontSize: '12px',
+    fontSize: '11px',
     fontWeight: '600',
-    background: type === 'success' ? '#d4edda' : type === 'warning' ? '#fff3cd' : type === 'error' ? '#f8d7da' : '#e9ecef',
-    color: type === 'success' ? '#155724' : type === 'warning' ? '#856404' : type === 'error' ? '#721c24' : '#333'
+    letterSpacing: '0.3px',
+    textTransform: 'uppercase',
+    background: type === 'success' ? brand.successBg : type === 'warning' ? brand.warningBg : type === 'error' ? brand.dangerBg : brand.gray100,
+    color: type === 'success' ? '#166534' : type === 'warning' ? brand.warningText : type === 'error' ? '#991b1b' : brand.gray600,
+    border: `1px solid ${type === 'success' ? brand.successBdr : type === 'warning' ? brand.warningBdr : type === 'error' ? brand.dangerBdr : brand.gray200}`,
   }),
+  // ---- RECORDING ----
   recordingIndicator: {
     display: 'flex',
     alignItems: 'center',
     gap: '12px',
-    padding: '20px',
-    background: '#fff5f5',
-    borderRadius: '12px',
-    border: '2px solid #fc8181'
+    padding: '16px 20px',
+    background: brand.dangerBg,
+    borderRadius: brand.radiusMd,
+    border: `1.5px solid ${brand.dangerBdr}`,
   },
   recordingDot: {
-    width: '12px',
-    height: '12px',
-    background: '#e53e3e',
+    width: '10px',
+    height: '10px',
+    background: brand.danger,
     borderRadius: '50%',
-    animation: 'pulse 1.5s ease-in-out infinite'
+    animation: 'pulse 1.5s ease-in-out infinite',
   },
+  // ---- APPROVAL ----
   approvalCard: {
-    background: 'linear-gradient(135deg, #fef3c7 0%, #fde68a 100%)',
-    borderRadius: '12px',
+    background: brand.orangeLight,
+    borderRadius: brand.radiusMd,
     padding: '24px',
-    marginBottom: '24px',
-    border: '2px solid #f59e0b'
+    marginBottom: '20px',
+    border: `1.5px solid ${brand.orange}`,
+    boxShadow: '0 2px 8px rgba(255,138,0,0.1)',
   },
+  // ---- LIST ITEMS ----
   listItem: {
     display: 'flex',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: '12px 16px',
-    background: 'white',
-    borderRadius: '8px',
-    marginBottom: '8px',
-    border: '1px solid #e9ecef'
-  }
+    background: brand.white,
+    borderRadius: brand.radius,
+    marginBottom: '6px',
+    border: `1px solid ${brand.gray200}`,
+    transition: 'box-shadow 0.15s ease',
+  },
+  // ---- UPLOAD ZONE ----
+  uploadZone: {
+    border: `2px dashed ${brand.blue}`,
+    borderRadius: brand.radiusMd,
+    padding: '28px 24px',
+    background: brand.blueLight,
+    textAlign: 'center',
+    cursor: 'pointer',
+    transition: 'all 0.2s ease',
+  },
 };
 
 // ============================================================================
@@ -1680,12 +1837,31 @@ const styles = {
 export default function AMSTranscriptionSuite() {
   // State management
   const [language, setLanguage] = useState('en');
+  const [activePage, setActivePage] = useState('transcription'); // dashboard | transcription | pdfManager | settings | privacy
   const [currentStep, setCurrentStep] = useState(1);
   const [isLocked, setIsLocked] = useState(false);
   const [showTimeoutWarning, setShowTimeoutWarning] = useState(false);
   const [timeoutSeconds, setTimeoutSeconds] = useState(60);
   const [pin, setPin] = useState('');
-  const [selectedForm, setSelectedForm] = useState('general');
+  const [selectedForm, setSelectedForm] = useState('mckenzieLumbar');
+  const [showConsentPopup, setShowConsentPopup] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  // Usage stats (persisted in localStorage)
+  const [usageStats, setUsageStats] = useState(() => {
+    try {
+      const saved = localStorage.getItem('ams_usage_stats');
+      return saved ? JSON.parse(saved) : {
+        totalPatients: 0,
+        totalRecordings: 0,
+        totalHours: 0,
+        sessionsToday: 0,
+        sessionsThisWeek: 0,
+        lastSessionDate: null,
+        dailyLog: [],
+      };
+    } catch { return { totalPatients: 0, totalRecordings: 0, totalHours: 0, sessionsToday: 0, sessionsThisWeek: 0, lastSessionDate: null, dailyLog: [] }; }
+  });
 
   // Form data state
   const [consentData, setConsentData] = useState({
@@ -1761,12 +1937,12 @@ export default function AMSTranscriptionSuite() {
       clearTimeout(inactivityTimerRef.current);
     }
 
-    // Show warning at 4 minutes
+    // Show warning at 1.5 minutes (90 seconds), lock at 2 minutes
     inactivityTimerRef.current = setTimeout(() => {
       setShowTimeoutWarning(true);
-      setTimeoutSeconds(60);
+      setTimeoutSeconds(30);
 
-      // Start countdown
+      // Start 30-second countdown
       const countdownInterval = setInterval(() => {
         setTimeoutSeconds(prev => {
           if (prev <= 1) {
@@ -1779,11 +1955,11 @@ export default function AMSTranscriptionSuite() {
         });
       }, 1000);
 
-      // Auto-lock at 5 minutes
+      // Safety: auto-lock at 30 seconds
       setTimeout(() => {
         clearInterval(countdownInterval);
-      }, 60000);
-    }, 240000); // 4 minutes
+      }, 30000);
+    }, 90000); // 1.5 minutes
   }, []);
 
   useEffect(() => {
@@ -1815,14 +1991,10 @@ export default function AMSTranscriptionSuite() {
   }, [isLocked, showTimeoutWarning, resetInactivityTimer]);
 
   const handleUnlock = () => {
-    if (pin === '1234') { // Demo PIN
-      setIsLocked(false);
-      setPin('');
-      resetInactivityTimer();
-      addAlert('success', 'Session unlocked');
-    } else {
-      addAlert('error', 'Invalid PIN');
-    }
+    setIsLocked(false);
+    setPin('');
+    resetInactivityTimer();
+    addAlert('success', 'Session unlocked');
   };
 
   const extendSession = () => {
@@ -2652,7 +2824,7 @@ export default function AMSTranscriptionSuite() {
                   </span>
                 </div>
                 {template.allMatches.length > 1 && (
-                  <div style={{ fontSize: '14px', color: '#6c757d' }}>
+                  <div style={{ fontSize: '14px', color: brand.gray600 }}>
                     Other possible matches:
                     <ul style={{ margin: '8px 0', paddingLeft: '20px' }}>
                       {template.allMatches.slice(1, 4).map(match => (
@@ -2665,7 +2837,7 @@ export default function AMSTranscriptionSuite() {
                 )}
               </>
             ) : (
-              <div style={{ color: '#dc3545' }}>
+              <div style={{ color: brand.danger }}>
                 Could not auto-detect form type. Please select manually.
               </div>
             )}
@@ -2711,7 +2883,7 @@ export default function AMSTranscriptionSuite() {
             }}>
               {template.fields.map((field, idx) => (
                 <div key={idx} style={{ marginBottom: '4px' }}>
-                  <span style={{ color: '#667eea' }}>{field.type}</span>: {field.name}
+                  <span style={{ color: brand.blue }}>{field.type}</span>: {field.name}
                 </div>
               ))}
             </div>
@@ -2774,8 +2946,7 @@ export default function AMSTranscriptionSuite() {
     switch (step) {
       case 1:
         return consentData.patientName &&
-               consentData.patientId &&
-               consentData.consentObtained;
+               consentData.patientId;
       case 2:
         return recordingData.audioUrl !== null;
       case 3:
@@ -2790,6 +2961,21 @@ export default function AMSTranscriptionSuite() {
   };
 
   const nextStep = () => {
+    // Step 1 special: show consent popup instead of advancing directly
+    if (currentStep === 1) {
+      if (consentData.patientName && consentData.patientId) {
+        if (consentData.consentObtained) {
+          // Already consented, just advance
+          setCurrentStep(2);
+        } else {
+          // Show the consent popup
+          setShowConsentPopup(true);
+        }
+      } else {
+        addAlert('warning', t('validationComplete'));
+      }
+      return;
+    }
     if (validateStep(currentStep)) {
       if (currentStep < 5) {
         setCurrentStep(currentStep + 1);
@@ -2822,20 +3008,29 @@ export default function AMSTranscriptionSuite() {
     </div>
   );
 
-  const renderProgressBar = () => (
-    <div style={styles.progressBar}>
-      {[1, 2, 3, 4, 5].map(step => (
-        <div key={step} style={styles.progressStep}>
-          <div style={styles.progressCircle(currentStep === step, currentStep > step)}>
-            {currentStep > step ? <Icons.Check size={16} /> : step}
-          </div>
-          <span style={styles.progressLabel(currentStep === step)}>
-            {t(`step${step}`)}
-          </span>
-        </div>
-      ))}
-    </div>
-  );
+  const renderProgressBar = () => {
+    const stepIcons = [Icons.Shield, Icons.Mic, Icons.FileText, Icons.File, Icons.Package];
+    return (
+      <div style={styles.progressBar}>
+        {[1, 2, 3, 4, 5].map((step, idx) => {
+          const StepIcon = stepIcons[idx];
+          return (
+            <React.Fragment key={step}>
+              {idx > 0 && <div style={styles.progressDivider} />}
+              <div className="ams-progress-step" style={styles.progressStep}>
+                <div style={styles.progressCircle(currentStep === step, currentStep > step)}>
+                  {currentStep > step ? <Icons.Check size={14} /> : <StepIcon size={14} />}
+                </div>
+                <span style={styles.progressLabel(currentStep === step)}>
+                  {t(`step${step}`)}
+                </span>
+              </div>
+            </React.Fragment>
+          );
+        })}
+      </div>
+    );
+  };
 
   // ============================================================================
   // STEP RENDERERS
@@ -2848,7 +3043,7 @@ export default function AMSTranscriptionSuite() {
       <div style={styles.formGrid}>
         <div style={styles.formGroup}>
           <label style={styles.label}>
-            {t('patientName')} <span style={{ color: '#dc3545' }}>*</span>
+            {t('patientName')} <span style={{ color: brand.danger }}>*</span>
           </label>
           <input
             type="text"
@@ -2861,7 +3056,7 @@ export default function AMSTranscriptionSuite() {
 
         <div style={styles.formGroup}>
           <label style={styles.label}>
-            {t('patientId')} <span style={{ color: '#dc3545' }}>*</span>
+            {t('patientId')} <span style={{ color: brand.danger }}>*</span>
           </label>
           <input
             type="text"
@@ -2883,19 +3078,6 @@ export default function AMSTranscriptionSuite() {
         </div>
 
         <div style={styles.formGroup}>
-          <label style={styles.label}>{t('consentType')}</label>
-          <select
-            style={styles.select}
-            value={consentData.consentType}
-            onChange={(e) => setConsentData(prev => ({ ...prev, consentType: e.target.value }))}
-          >
-            <option value="verbal">{t('verbalConsent')}</option>
-            <option value="written">{t('writtenConsent')}</option>
-            <option value="electronic">{t('electronicConsent')}</option>
-          </select>
-        </div>
-
-        <div style={styles.formGroup}>
           <label style={styles.label}>{t('witnessName')}</label>
           <input
             type="text"
@@ -2907,28 +3089,23 @@ export default function AMSTranscriptionSuite() {
         </div>
       </div>
 
-      <div style={{ ...styles.section, marginTop: '24px' }}>
-        <label style={styles.checkbox}>
-          <input
-            type="checkbox"
-            style={styles.checkboxInput}
-            checked={consentData.consentObtained}
-            onChange={(e) => setConsentData(prev => ({
-              ...prev,
-              consentObtained: e.target.checked,
-              timestamp: e.target.checked ? new Date().toISOString() : null
-            }))}
-          />
-          <span style={{ fontWeight: '600' }}>
-            {t('consentObtained')} <span style={{ color: '#dc3545' }}>*</span>
-          </span>
-        </label>
-        {consentData.timestamp && (
-          <p style={{ marginTop: '8px', fontSize: '12px', color: '#6c757d' }}>
-            Recorded: {new Date(consentData.timestamp).toLocaleString()}
-          </p>
-        )}
-      </div>
+      {/* Consent status indicator */}
+      {consentData.consentObtained ? (
+        <div style={{ ...styles.alert('success'), marginTop: '20px' }}>
+          <Icons.CheckCircle size={16} />
+          <div>
+            <strong>{language === 'en' ? 'Electronic Consent Obtained' : 'Consentement Électronique Obtenu'}</strong>
+            <div style={{ fontSize: '12px', marginTop: '2px', opacity: 0.85 }}>
+              {consentData.patientName} &mdash; {new Date(consentData.timestamp).toLocaleString()}
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div style={{ ...styles.alert('info'), marginTop: '20px' }}>
+          <Icons.Info size={16} />
+          <span>{language === 'en' ? 'Fill in patient details above, then click Next to obtain electronic consent.' : 'Remplissez les informations ci-dessus, puis cliquez Suivant pour obtenir le consentement électronique.'}</span>
+        </div>
+      )}
     </div>
   );
 
@@ -2941,7 +3118,7 @@ export default function AMSTranscriptionSuite() {
         <div style={styles.recordingIndicator}>
           <div style={styles.recordingDot} />
           <Icons.Mic size={16} style={{ marginRight: '6px' }} />
-          <span style={{ fontWeight: '600', color: '#e53e3e' }}>
+          <span style={{ fontWeight: '600', color: brand.danger }}>
             Recording... {formatDuration(recordingData.duration)}
           </span>
           {recordingData.isPaused && <span style={styles.badge('warning')}><Icons.Pause size={12} /> Paused</span>}
@@ -2979,12 +3156,25 @@ export default function AMSTranscriptionSuite() {
 
         <div style={{ marginTop: '20px' }}>
           <label style={styles.label}><Icons.Upload size={14} style={{ marginRight: '6px' }} />{t('uploadAudio')}</label>
-          <input
-            type="file"
-            accept="audio/*"
-            onChange={handleAudioUpload}
-            style={{ ...styles.input, padding: '10px' }}
-          />
+          <label className="ams-upload-zone" style={{
+            ...styles.uploadZone,
+            padding: '20px',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '8px',
+          }}>
+            <Icons.Upload size={24} style={{ color: brand.blue }} />
+            <span style={{ fontSize: '13px', color: brand.blue, fontWeight: '500' }}>
+              {language === 'en' ? 'Click to browse or drag audio file here' : 'Cliquez pour parcourir ou glissez un fichier audio ici'}
+            </span>
+            <input
+              type="file"
+              accept="audio/*"
+              onChange={handleAudioUpload}
+              style={{ display: 'none' }}
+            />
+          </label>
         </div>
 
         {recordingData.audioUrl && (
@@ -3018,6 +3208,19 @@ export default function AMSTranscriptionSuite() {
         <h2 style={styles.stepTitle}>{t('notesTitle')}</h2>
         <p style={styles.stepDescription}>{t('notesDescription')}</p>
 
+        <div style={{
+          display: 'flex', alignItems: 'flex-start', gap: '10px',
+          padding: '12px 14px', background: brand.blueLight, border: `1px solid ${brand.blue}30`,
+          borderRadius: brand.radius, marginBottom: '16px',
+        }}>
+          <Icons.Info size={16} style={{ color: brand.blue, flexShrink: 0, marginTop: '1px' }} />
+          <p style={{ fontSize: '12px', color: brand.blueDark, lineHeight: '1.5', margin: 0 }}>
+            {language === 'en'
+              ? 'Each field below maps to a corresponding field in the selected PDF template. When you generate the PDF in Step 4, these values are used to populate the template automatically.'
+              : 'Chaque champ ci-dessous correspond à un champ du modèle PDF sélectionné. Lors de la génération du PDF à l\'étape 4, ces valeurs remplissent automatiquement le modèle.'}
+          </p>
+        </div>
+
         <div style={styles.formGroup}>
           <label style={styles.label}>{t('selectFormType')}</label>
           <select
@@ -3050,7 +3253,7 @@ export default function AMSTranscriptionSuite() {
                 <div key={fieldIndex} style={styles.formGroup}>
                   <label style={styles.label}>
                     {field.id.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
-                    {field.required && <span style={{ color: '#dc3545' }}> *</span>}
+                    {field.required && <span style={{ color: brand.danger }}> *</span>}
                   </label>
                   {field.type === 'textarea' ? (
                     <textarea
@@ -3102,58 +3305,216 @@ export default function AMSTranscriptionSuite() {
       <h2 style={styles.stepTitle}>{t('pdfTitle')}</h2>
       <p style={styles.stepDescription}>{t('pdfDescription')}</p>
 
-      {/* Upload Custom PDF Template Section */}
-      <div style={{ ...styles.section, background: 'linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%)', border: '2px dashed #667eea' }}>
+      {/* ── SECTION 1: BUILT-IN PDF FORMS LIBRARY ── */}
+      <div style={styles.section}>
         <h3 style={styles.sectionTitle}>
-          {language === 'en' ? 'Upload Custom PDF Template' : 'Télécharger un Modèle PDF Personnalisé'}
+          <Icons.Folder size={16} style={{ marginRight: '8px' }} />
+          {language === 'en' ? 'Built-in Form Templates' : 'Modèles de Formulaires Intégrés'}
+          <span style={{
+            marginLeft: 'auto',
+            fontSize: '11px',
+            fontWeight: '600',
+            color: brand.gray600,
+            fontFamily: brand.fontBody,
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px',
+          }}>
+            {Object.keys(formSchemas).length} {language === 'en' ? 'available' : 'disponibles'}
+          </span>
         </h3>
-        <p style={{ fontSize: '14px', color: '#4c51bf', marginBottom: '16px' }}>
-          {language === 'en'
-            ? 'Upload a fillable PDF form. AI will auto-detect the form type and extract fields. Requires your approval before use.'
-            : 'Téléchargez un formulaire PDF remplissable. L\'IA détectera automatiquement le type et extraira les champs. Nécessite votre approbation.'
-          }
-        </p>
 
-        <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
-          <label style={{ ...styles.button, ...styles.primaryButton, cursor: 'pointer' }}>
-            <input
-              type="file"
-              accept="application/pdf"
-              onChange={handleTemplateUpload}
-              style={{ display: 'none' }}
-            />
-            {language === 'en' ? 'Choose PDF Template' : 'Choisir un Modèle PDF'}
-          </label>
-
-          {pendingTemplates.filter(t => t.status === 'pending_approval').length > 0 && (
-            <span style={styles.badge('warning')}>
-              {pendingTemplates.filter(t => t.status === 'pending_approval').length} pending approval
-            </span>
-          )}
+        {/* Form selector dropdown */}
+        <div style={{ marginBottom: '16px' }}>
+          <label style={styles.label}>{t('selectFormType')}</label>
+          <select
+            style={styles.select}
+            value={selectedForm}
+            onChange={(e) => setSelectedForm(e.target.value)}
+          >
+            {Object.entries(formSchemas).map(([key, form]) => (
+              <option key={key} value={key}>{form.name[language]}</option>
+            ))}
+          </select>
         </div>
 
-        {/* Show loaded templates */}
-        {Object.keys(pdfTemplates).length > 0 && (
-          <div style={{ marginTop: '16px' }}>
-            <strong style={{ fontSize: '14px' }}>
-              {language === 'en' ? 'Loaded Templates:' : 'Modèles Chargés:'}
-            </strong>
-            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '8px' }}>
-              {Object.entries(pdfTemplates).map(([formId, template]) => (
-                <span key={formId} style={{ ...styles.badge('success'), fontSize: '11px' }}>
-                  {formSchemas[formId]?.name[language] || formId}: {template.fields.length} fields
-                </span>
-              ))}
-            </div>
-          </div>
-        )}
+        {/* Grid of all built-in forms showing selected state */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+          gap: '8px',
+        }}>
+          {Object.entries(formSchemas).map(([key, form]) => {
+            const isSelected = selectedForm === key;
+            const hasUploadedTemplate = !!pdfTemplates[key];
+            return (
+              <div
+                key={key}
+                onClick={() => setSelectedForm(key)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  padding: '10px 14px',
+                  borderRadius: brand.radius,
+                  border: isSelected ? `2px solid ${brand.blue}` : `1px solid ${brand.gray200}`,
+                  background: isSelected ? brand.blueLight : brand.white,
+                  cursor: 'pointer',
+                  transition: 'all 0.15s ease',
+                }}
+              >
+                <div style={{
+                  width: '32px',
+                  height: '32px',
+                  minWidth: '32px',
+                  borderRadius: '6px',
+                  background: isSelected ? brand.blue : brand.gray100,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}>
+                  <Icons.FileText size={14} style={{ color: isSelected ? brand.white : brand.gray600 }} />
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{
+                    fontSize: '12px',
+                    fontWeight: isSelected ? '600' : '500',
+                    color: isSelected ? brand.blue : brand.gray800,
+                    lineHeight: '1.3',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}>
+                    {form.name[language]}
+                  </div>
+                  <div style={{ fontSize: '10px', color: brand.gray400, marginTop: '2px' }}>
+                    {form.sections.length} {language === 'en' ? 'sections' : 'sections'}
+                    {hasUploadedTemplate && (
+                      <span style={{ color: brand.success, marginLeft: '6px' }}>
+                        + {language === 'en' ? 'custom' : 'perso.'}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                {isSelected && (
+                  <Icons.Check size={14} style={{ color: brand.blue, flexShrink: 0 }} />
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
 
-      {/* PDF Settings */}
-      <div style={styles.section}>
-        <h3 style={styles.sectionTitle}>{t('pdfSettings')}</h3>
+      {/* ── SECTION 2: UPLOAD CUSTOM PDF TEMPLATE ── */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+        {/* Upload area */}
+        <label className="ams-upload-zone" style={{
+          ...styles.uploadZone,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: '10px',
+          minHeight: '160px',
+          cursor: 'pointer',
+        }}>
+          <div style={{
+            width: '48px',
+            height: '48px',
+            borderRadius: '50%',
+            background: brand.white,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: brand.shadow,
+          }}>
+            <Icons.Upload size={22} style={{ color: brand.blue }} />
+          </div>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '14px', fontWeight: '600', color: brand.blue }}>
+              {language === 'en' ? 'Upload Custom Template' : 'Télécharger un Modèle'}
+            </div>
+            <div style={{ fontSize: '11px', color: brand.gray600, marginTop: '4px' }}>
+              {language === 'en' ? 'Fillable PDF — auto-detected & mapped' : 'PDF remplissable — détection automatique'}
+            </div>
+            <div style={{ fontSize: '10px', color: brand.gray400, marginTop: '6px', lineHeight: '1.4' }}>
+              {language === 'en'
+                ? 'Available to your account immediately. Requires admin approval for global automation.'
+                : 'Disponible pour votre compte immédiatement. Nécessite l\'approbation admin pour l\'automatisation globale.'}
+            </div>
+          </div>
+          <input
+            type="file"
+            accept="application/pdf"
+            onChange={handleTemplateUpload}
+            style={{ display: 'none' }}
+          />
+          {pendingTemplates.filter(t => t.status === 'pending_approval').length > 0 && (
+            <span style={styles.badge('warning')}>
+              {pendingTemplates.filter(t => t.status === 'pending_approval').length} {language === 'en' ? 'pending approval' : 'en attente'}
+            </span>
+          )}
+        </label>
 
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        {/* Loaded / uploaded templates list */}
+        <div style={{
+          ...styles.section,
+          marginBottom: 0,
+          display: 'flex',
+          flexDirection: 'column',
+        }}>
+          <h3 style={{ ...styles.sectionTitle, fontSize: '14px', marginBottom: '12px', paddingBottom: '8px' }}>
+            <Icons.Clipboard size={14} style={{ marginRight: '8px' }} />
+            {language === 'en' ? 'Uploaded Templates' : 'Modèles Téléchargés'}
+            <span style={{ marginLeft: 'auto', fontFamily: brand.fontBody, fontWeight: '600', fontSize: '11px', color: brand.gray400 }}>
+              {Object.keys(pdfTemplates).length}
+            </span>
+          </h3>
+          {Object.keys(pdfTemplates).length === 0 ? (
+            <div style={{
+              flex: 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: brand.gray400,
+              fontSize: '12px',
+              fontStyle: 'italic',
+              padding: '16px 0',
+            }}>
+              {language === 'en' ? 'No custom templates uploaded yet' : 'Aucun modèle téléchargé'}
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              {Object.entries(pdfTemplates).map(([formId, template]) => (
+                <div key={formId} style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '8px 12px',
+                  background: brand.white,
+                  borderRadius: brand.radius,
+                  border: `1px solid ${brand.gray200}`,
+                }}>
+                  <Icons.File size={14} style={{ color: brand.success, flexShrink: 0 }} />
+                  <span style={{ fontSize: '12px', fontWeight: '500', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {formSchemas[formId]?.name[language] || formId}
+                  </span>
+                  <span style={{ ...styles.badge('success'), padding: '2px 8px', fontSize: '10px' }}>
+                    {template.fields.length} {language === 'en' ? 'fields' : 'champs'}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ── SECTION 3: PDF SETTINGS ── */}
+      <div style={{ ...styles.section, marginTop: '16px' }}>
+        <h3 style={{ ...styles.sectionTitle, fontSize: '14px', marginBottom: '12px', paddingBottom: '8px' }}>
+          <Icons.Settings size={14} style={{ marginRight: '8px' }} />
+          {t('pdfSettings')}
+        </h3>
+        <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
           <label style={styles.checkbox}>
             <input
               type="checkbox"
@@ -3164,9 +3525,8 @@ export default function AMSTranscriptionSuite() {
                 settings: { ...prev.settings, includeHeader: e.target.checked }
               }))}
             />
-            <span>{t('includeHeader')}</span>
+            <span style={{ fontSize: '13px' }}>{t('includeHeader')}</span>
           </label>
-
           <label style={styles.checkbox}>
             <input
               type="checkbox"
@@ -3177,9 +3537,8 @@ export default function AMSTranscriptionSuite() {
                 settings: { ...prev.settings, includeFooter: e.target.checked }
               }))}
             />
-            <span>{t('includeFooter')}</span>
+            <span style={{ fontSize: '13px' }}>{t('includeFooter')}</span>
           </label>
-
           <label style={styles.checkbox}>
             <input
               type="checkbox"
@@ -3190,55 +3549,69 @@ export default function AMSTranscriptionSuite() {
                 settings: { ...prev.settings, includeSignature: e.target.checked }
               }))}
             />
-            <span>{t('includeSignature')}</span>
+            <span style={{ fontSize: '13px' }}>{t('includeSignature')}</span>
           </label>
         </div>
       </div>
 
-      {/* Selected Form Info */}
-      <div style={{ ...styles.alert('info'), marginTop: '16px' }}>
-        <strong>{language === 'en' ? 'Selected Form:' : 'Formulaire Sélectionné:'}</strong>{' '}
-        {formSchemas[selectedForm]?.name[language] || selectedForm}
-        {pdfTemplates[selectedForm] && (
-          <span style={{ marginLeft: '12px', ...styles.badge('success') }}>
-            Template loaded ({pdfTemplates[selectedForm].fields.length} fields)
-          </span>
-        )}
-      </div>
-
-      <div style={{ display: 'flex', gap: '12px', marginTop: '24px', flexWrap: 'wrap' }}>
-        <button
-          style={{ ...styles.button, ...styles.primaryButton }}
-          onClick={generatePDF}
-        >
-          <Icons.FileText size={16} />
-          {pdfTemplates[selectedForm]
-            ? (language === 'en' ? 'Fill PDF Template' : 'Remplir le Modèle PDF')
-            : t('generatePdf')
-          }
-        </button>
-
-        {pdfData.generated && (
-          <>
-            <button
-              style={{ ...styles.button, ...styles.secondaryButton }}
-              onClick={() => window.open(pdfData.pdfUrl, '_blank')}
-            >
-              <Icons.Eye size={16} /> {t('previewPdf')}
-            </button>
-
-            <button
-              style={{ ...styles.button, ...styles.successButton }}
-              onClick={downloadPDF}
-            >
-              <Icons.Download size={16} /> {t('downloadPdf')}
-            </button>
-          </>
-        )}
+      {/* ── SECTION 4: SELECTED FORM + GENERATE ── */}
+      <div style={{
+        marginTop: '16px',
+        padding: '20px 24px',
+        background: brand.blueLight,
+        borderRadius: brand.radiusMd,
+        border: `1px solid #bae6fd`,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        flexWrap: 'wrap',
+        gap: '12px',
+      }}>
+        <div>
+          <div style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: '600', color: brand.gray600, marginBottom: '4px' }}>
+            {language === 'en' ? 'Selected Form' : 'Formulaire Sélectionné'}
+          </div>
+          <div style={{ fontSize: '15px', fontWeight: '600', color: brand.blue, fontFamily: brand.fontHeading }}>
+            {formSchemas[selectedForm]?.name[language] || selectedForm}
+            {pdfTemplates[selectedForm] && (
+              <span style={{ marginLeft: '10px', ...styles.badge('success'), fontSize: '10px' }}>
+                {language === 'en' ? 'Custom template loaded' : 'Modèle personnalisé chargé'}
+              </span>
+            )}
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+          <button
+            style={{ ...styles.button, ...styles.primaryButton }}
+            onClick={generatePDF}
+          >
+            <Icons.FileText size={14} />
+            {pdfTemplates[selectedForm]
+              ? (language === 'en' ? 'Fill Template' : 'Remplir le Modèle')
+              : t('generatePdf')
+            }
+          </button>
+          {pdfData.generated && (
+            <>
+              <button
+                style={{ ...styles.button, ...styles.secondaryButton }}
+                onClick={() => window.open(pdfData.pdfUrl, '_blank')}
+              >
+                <Icons.Eye size={14} /> {t('previewPdf')}
+              </button>
+              <button
+                style={{ ...styles.button, ...styles.successButton }}
+                onClick={downloadPDF}
+              >
+                <Icons.Download size={14} /> {t('downloadPdf')}
+              </button>
+            </>
+          )}
+        </div>
       </div>
 
       {pdfData.generated && (
-        <div style={{ ...styles.alert('success'), marginTop: '24px' }}>
+        <div style={{ ...styles.alert('success'), marginTop: '16px' }}>
           <Icons.CheckCircle size={16} style={{ marginRight: '8px' }} />
           {pdfTemplates[selectedForm]
             ? (language === 'en' ? 'PDF form fields filled successfully' : 'Champs du formulaire PDF remplis avec succès')
@@ -3406,25 +3779,33 @@ export default function AMSTranscriptionSuite() {
   // ============================================================================
   const renderLockScreen = () => (
     <div style={styles.modal}>
-      <div style={styles.modalContent}>
-        <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-          <Icons.Lock size={48} style={{ color: '#667eea' }} />
+      <div style={{ ...styles.modalContent, textAlign: 'center', maxWidth: '420px' }}>
+        <div style={{
+          width: '72px', height: '72px', borderRadius: '50%',
+          background: brand.blueLight, display: 'flex', alignItems: 'center',
+          justifyContent: 'center', margin: '0 auto 20px',
+        }}>
+          <Icons.Lock size={32} style={{ color: brand.blue }} />
         </div>
-        <h2 style={styles.modalTitle}>{t('locked')}</h2>
-        <p style={{ marginBottom: '20px', color: '#6c757d' }}>{t('enterPin')}</p>
-
-        <input
-          type="password"
-          style={styles.input}
-          value={pin}
-          onChange={(e) => setPin(e.target.value)}
-          placeholder="Enter PIN (demo: 1234)"
-          maxLength={4}
-          onKeyPress={(e) => e.key === 'Enter' && handleUnlock()}
-        />
+        <h2 style={{ ...styles.modalTitle, textAlign: 'center' }}>{t('locked')}</h2>
+        <div style={{
+          background: brand.gray50, border: `1px solid ${brand.gray200}`,
+          borderRadius: brand.radius, padding: '16px', marginBottom: '20px',
+        }}>
+          <p style={{ color: brand.gray800, fontSize: '14px', lineHeight: '1.6', fontWeight: '500' }}>
+            {language === 'en'
+              ? 'Recurring autolock — 2 min compliance function'
+              : 'Verrouillage automatique récurrent — fonction de conformité 2 min'}
+          </p>
+          <p style={{ color: brand.gray500, fontSize: '12px', marginTop: '8px' }}>
+            {language === 'en'
+              ? 'This session was automatically locked due to inactivity to comply with healthcare data protection standards.'
+              : 'Cette session a été automatiquement verrouillée en raison de l\'inactivité pour se conformer aux normes de protection des données de santé.'}
+          </p>
+        </div>
 
         <button
-          style={{ ...styles.button, ...styles.primaryButton, width: '100%', marginTop: '16px' }}
+          style={{ ...styles.button, ...styles.blueButton, width: '100%', justifyContent: 'center', padding: '12px' }}
           onClick={handleUnlock}
         >
           <Icons.Unlock size={16} /> {t('unlock')}
@@ -3435,24 +3816,28 @@ export default function AMSTranscriptionSuite() {
 
   const renderTimeoutWarning = () => (
     <div style={styles.modal}>
-      <div style={styles.modalContent}>
-        <div style={{ textAlign: 'center', marginBottom: '16px' }}>
-          <Icons.Clock size={48} style={{ color: '#f59e0b' }} />
+      <div style={{ ...styles.modalContent, textAlign: 'center' }}>
+        <div style={{
+          width: '72px', height: '72px', borderRadius: '50%',
+          background: brand.orangeLight, display: 'flex', alignItems: 'center',
+          justifyContent: 'center', margin: '0 auto 16px',
+        }}>
+          <Icons.Clock size={32} style={{ color: brand.orange }} />
         </div>
-        <h2 style={styles.modalTitle}>{t('sessionTimeout')}</h2>
-        <p style={{ marginBottom: '20px', color: '#6c757d' }}>
-          {t('sessionExpiring')} <strong>{timeoutSeconds}</strong> seconds
+        <h2 style={{ ...styles.modalTitle, textAlign: 'center' }}>{t('sessionTimeout')}</h2>
+        <p style={{ marginBottom: '20px', color: brand.gray600, fontSize: '14px' }}>
+          {t('sessionExpiring')} <strong style={{ color: brand.orange, fontSize: '20px', fontFamily: brand.fontHeading }}>{timeoutSeconds}</strong> {language === 'en' ? 'seconds' : 'secondes'}
         </p>
 
-        <div style={{ display: 'flex', gap: '12px' }}>
+        <div style={{ display: 'flex', gap: '10px' }}>
           <button
-            style={{ ...styles.button, ...styles.primaryButton, flex: 1 }}
+            style={{ ...styles.button, ...styles.blueButton, flex: 1, justifyContent: 'center', padding: '12px' }}
             onClick={extendSession}
           >
             {t('extendSession')}
           </button>
           <button
-            style={{ ...styles.button, ...styles.secondaryButton, flex: 1 }}
+            style={{ ...styles.button, ...styles.secondaryButton, flex: 1, justifyContent: 'center', padding: '12px' }}
             onClick={() => setIsLocked(true)}
           >
             {t('logout')}
@@ -3461,6 +3846,830 @@ export default function AMSTranscriptionSuite() {
       </div>
     </div>
   );
+
+  // ============================================================================
+  // CONSENT POPUP
+  // ============================================================================
+  const renderConsentPopup = () => {
+    if (!showConsentPopup) return null;
+    const patientName = consentData.patientName || '___________';
+    const today = new Date().toLocaleDateString(language === 'fr' ? 'fr-CA' : 'en-CA');
+    return (
+      <div style={styles.modal}>
+        <div style={{ ...styles.modalContent, maxWidth: '560px' }}>
+          {/* Header */}
+          <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+            <img src="/ams-logo.png" alt="AMS" style={{ height: '36px', marginBottom: '10px', filter: 'brightness(0) saturate(100%) invert(35%) sepia(85%) saturate(1200%) hue-rotate(180deg)' }} />
+            <h2 style={{ fontFamily: brand.fontHeading, fontSize: '20px', fontWeight: '700', color: brand.blue }}>
+              {language === 'en' ? 'Electronic Consent Form' : 'Formulaire de Consentement Électronique'}
+            </h2>
+            <p style={{ fontSize: '11px', color: brand.gray600, marginTop: '4px' }}>
+              AMS Centre Médical et de Réadaptation
+            </p>
+          </div>
+
+          {/* Consent body */}
+          <div style={{
+            background: brand.gray50,
+            borderRadius: brand.radiusMd,
+            border: `1px solid ${brand.gray200}`,
+            padding: '20px',
+            marginBottom: '20px',
+            fontSize: '13px',
+            color: brand.gray800,
+            lineHeight: '1.7',
+          }}>
+            <p style={{ marginBottom: '12px' }}>
+              {language === 'en'
+                ? `I, `
+                : `Je, `}
+              <strong style={{ color: brand.blue, borderBottom: `1px solid ${brand.blue}`, paddingBottom: '1px' }}>
+                {patientName}
+              </strong>
+              {language === 'en'
+                ? `, hereby consent to the audio recording of my clinical session at AMS Centre Médical et de Réadaptation for the purposes of medical transcription and documentation.`
+                : `, consens par la présente à l'enregistrement audio de ma séance clinique au Centre Médical et de Réadaptation AMS aux fins de transcription et de documentation médicale.`}
+            </p>
+            <p style={{ marginBottom: '12px' }}>
+              {language === 'en'
+                ? 'I understand that:'
+                : 'Je comprends que :'}
+            </p>
+            <ul style={{ paddingLeft: '18px', marginBottom: '12px' }}>
+              <li>{language === 'en' ? 'The recording will be used solely for clinical documentation purposes' : 'L\'enregistrement sera utilisé uniquement à des fins de documentation clinique'}</li>
+              <li>{language === 'en' ? 'My data will be handled in accordance with Quebec privacy regulations (Loi 25)' : 'Mes données seront traitées conformément aux réglementations québécoises (Loi 25)'}</li>
+              <li>{language === 'en' ? 'I may withdraw my consent at any time by notifying my clinician' : 'Je peux retirer mon consentement à tout moment en avisant mon clinicien'}</li>
+              <li>{language === 'en' ? 'All recordings are processed locally and not shared with third parties' : 'Tous les enregistrements sont traités localement et non partagés avec des tiers'}</li>
+            </ul>
+            <p style={{ fontSize: '12px', color: brand.gray600 }}>
+              {language === 'en' ? 'Date:' : 'Date :'} {today} &nbsp;&middot;&nbsp; {language === 'en' ? 'Patient ID:' : 'ID Patient :'} {consentData.patientId || '—'}
+            </p>
+          </div>
+
+          {/* Consent checkbox */}
+          <div style={{
+            padding: '16px',
+            background: consentData.consentObtained ? brand.successBg : brand.orangeLight,
+            borderRadius: brand.radiusMd,
+            border: `1.5px solid ${consentData.consentObtained ? brand.successBdr : brand.orange}`,
+            marginBottom: '20px',
+            transition: 'all 0.2s ease',
+          }}>
+            <label style={{ ...styles.checkbox, gap: '14px', cursor: 'pointer' }}>
+              <input
+                type="checkbox"
+                style={{ ...styles.checkboxInput, width: '22px', height: '22px', accentColor: brand.success }}
+                checked={consentData.consentObtained}
+                onChange={(e) => setConsentData(prev => ({
+                  ...prev,
+                  consentObtained: e.target.checked,
+                  consentType: 'electronic',
+                  timestamp: e.target.checked ? new Date().toISOString() : null
+                }))}
+              />
+              <div>
+                <div style={{ fontWeight: '600', fontSize: '14px', color: consentData.consentObtained ? '#166534' : brand.gray900 }}>
+                  {language === 'en'
+                    ? `I, ${patientName}, agree to the terms above`
+                    : `Je, ${patientName}, accepte les conditions ci-dessus`}
+                </div>
+                <div style={{ fontSize: '11px', color: brand.gray600, marginTop: '3px' }}>
+                  {language === 'en' ? 'Electronic consent — check to proceed' : 'Consentement électronique — cochez pour continuer'}
+                </div>
+              </div>
+            </label>
+          </div>
+
+          {/* Buttons */}
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <button
+              style={{ ...styles.button, ...styles.secondaryButton, flex: 1, justifyContent: 'center' }}
+              onClick={() => setShowConsentPopup(false)}
+            >
+              {t('cancel')}
+            </button>
+            <button
+              style={{
+                ...styles.button, ...styles.blueButton, flex: 1, justifyContent: 'center',
+                ...(!consentData.consentObtained ? styles.disabledButton : {})
+              }}
+              disabled={!consentData.consentObtained}
+              onClick={() => {
+                setShowConsentPopup(false);
+                setCurrentStep(2);
+                setUsageStats(prev => {
+                  const updated = { ...prev, totalPatients: prev.totalPatients + 1, sessionsToday: prev.sessionsToday + 1, sessionsThisWeek: prev.sessionsThisWeek + 1, lastSessionDate: new Date().toISOString() };
+                  localStorage.setItem('ams_usage_stats', JSON.stringify(updated));
+                  return updated;
+                });
+                addAlert('success', language === 'en' ? 'Consent recorded — ready to record' : 'Consentement enregistré — prêt à enregistrer');
+              }}
+            >
+              <Icons.ArrowRight size={14} />
+              {language === 'en' ? 'Continue' : 'Continuer'}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // ============================================================================
+  // DASHBOARD PAGE
+  // ============================================================================
+  const renderDashboard = () => {
+    const statCards = [
+      { label: language === 'en' ? 'Total Patients' : 'Patients Totaux', value: usageStats.totalPatients, icon: Icons.User, color: brand.blue },
+      { label: language === 'en' ? 'Today\'s Sessions' : 'Sessions Aujourd\'hui', value: usageStats.sessionsToday, icon: Icons.Clock, color: brand.orange },
+      { label: language === 'en' ? 'This Week' : 'Cette Semaine', value: usageStats.sessionsThisWeek, icon: Icons.Chart, color: brand.success },
+      { label: language === 'en' ? 'Total Hours' : 'Heures Totales', value: usageStats.totalHours.toFixed(1), icon: Icons.Mic, color: '#8b5cf6' },
+    ];
+
+    return (
+      <div>
+        <h2 style={styles.stepTitle}>
+          {language === 'en' ? 'Dashboard' : 'Tableau de Bord'}
+        </h2>
+        <p style={styles.stepDescription}>
+          {language === 'en' ? 'Overview of your transcription activity' : 'Aperçu de votre activité de transcription'}
+        </p>
+
+        {/* Stat Cards */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '24px' }}>
+          {statCards.map((stat, idx) => {
+            const StatIcon = stat.icon;
+            return (
+              <div key={idx} style={{
+                background: brand.white,
+                borderRadius: brand.radiusMd,
+                padding: '20px',
+                border: `1px solid ${brand.gray200}`,
+                display: 'flex',
+                alignItems: 'center',
+                gap: '16px',
+              }}>
+                <div style={{
+                  width: '48px', height: '48px', borderRadius: '12px',
+                  background: `${stat.color}12`, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <StatIcon size={22} style={{ color: stat.color }} />
+                </div>
+                <div>
+                  <div style={{ fontSize: '28px', fontWeight: '700', fontFamily: brand.fontHeading, color: brand.gray900, lineHeight: '1' }}>
+                    {stat.value}
+                  </div>
+                  <div style={{ fontSize: '12px', color: brand.gray600, marginTop: '4px' }}>
+                    {stat.label}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Quick Actions */}
+        <div style={styles.section}>
+          <h3 style={styles.sectionTitle}>
+            <Icons.Play size={14} style={{ marginRight: '8px' }} />
+            {language === 'en' ? 'Quick Actions' : 'Actions Rapides'}
+          </h3>
+          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+            <button
+              style={{ ...styles.button, ...styles.primaryButton, padding: '14px 28px' }}
+              onClick={() => {
+                setShowConsentPopup(true);
+              }}
+            >
+              <Icons.Plus size={14} />
+              {language === 'en' ? 'New Transcription' : 'Nouvelle Transcription'}
+            </button>
+            <button
+              style={{ ...styles.button, ...styles.blueButton, padding: '14px 28px' }}
+              onClick={() => setActivePage('pdfManager')}
+            >
+              <Icons.Folder size={14} />
+              {language === 'en' ? 'Manage PDF Templates' : 'Gérer les Modèles PDF'}
+            </button>
+          </div>
+        </div>
+
+        {/* Recent Activity */}
+        <div style={styles.section}>
+          <h3 style={styles.sectionTitle}>
+            <Icons.Clock size={14} style={{ marginRight: '8px' }} />
+            {language === 'en' ? 'Recent Activity' : 'Activité Récente'}
+          </h3>
+          {usageStats.totalPatients === 0 ? (
+            <div style={{ padding: '24px', textAlign: 'center', color: brand.gray400, fontSize: '13px' }}>
+              {language === 'en' ? 'No sessions recorded yet. Start your first transcription!' : 'Aucune session enregistrée. Commencez votre première transcription!'}
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              {usageStats.lastSessionDate && (
+                <div style={styles.listItem}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Icons.CheckCircle size={14} style={{ color: brand.success }} />
+                    <span style={{ fontSize: '13px' }}>
+                      {language === 'en' ? 'Last session' : 'Dernière session'}
+                    </span>
+                  </div>
+                  <span style={{ fontSize: '12px', color: brand.gray600 }}>
+                    {new Date(usageStats.lastSessionDate).toLocaleString()}
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  // ============================================================================
+  // PDF MANAGER PAGE
+  // ============================================================================
+  const renderPdfManager = () => (
+    <div>
+      <h2 style={styles.stepTitle}>
+        <Icons.Folder size={22} style={{ marginRight: '10px', verticalAlign: 'middle' }} />
+        {language === 'en' ? 'PDF Template Manager' : 'Gestionnaire de Modèles PDF'}
+      </h2>
+      <p style={styles.stepDescription}>
+        {language === 'en'
+          ? 'Upload new fielded PDFs, view existing templates, and manage your form library.'
+          : 'Téléchargez de nouveaux PDF, consultez les modèles existants et gérez votre bibliothèque de formulaires.'}
+      </p>
+
+      {/* Upload new template */}
+      <label className="ams-upload-zone" style={{
+        ...styles.uploadZone,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '12px',
+        minHeight: '140px',
+        cursor: 'pointer',
+        marginBottom: '24px',
+      }}>
+        <div style={{
+          width: '56px', height: '56px', borderRadius: '50%',
+          background: brand.white, display: 'flex', alignItems: 'center', justifyContent: 'center',
+          boxShadow: brand.shadow,
+        }}>
+          <Icons.Upload size={26} style={{ color: brand.blue }} />
+        </div>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '15px', fontWeight: '600', color: brand.blue, fontFamily: brand.fontHeading }}>
+            {language === 'en' ? 'Upload New PDF Template' : 'Télécharger un Nouveau Modèle PDF'}
+          </div>
+          <div style={{ fontSize: '12px', color: brand.gray600, marginTop: '4px' }}>
+            {language === 'en' ? 'Fillable PDF forms — fields are auto-detected and mapped to assessment types' : 'Formulaires PDF remplissables — les champs sont détectés et mappés automatiquement'}
+          </div>
+          <div style={{ fontSize: '11px', color: brand.gray400, marginTop: '8px', maxWidth: '480px', lineHeight: '1.5' }}>
+            {language === 'en'
+              ? 'Uploaded PDFs can be used by your account immediately by choosing it after the recording, but require admin or developer approval before being added to the global system\'s automation.'
+              : 'Les PDF téléchargés peuvent être utilisés par votre compte immédiatement en les choisissant après l\'enregistrement, mais nécessitent l\'approbation d\'un administrateur ou développeur avant d\'être ajoutés à l\'automatisation globale du système.'}
+          </div>
+        </div>
+        <input
+          type="file"
+          accept="application/pdf"
+          onChange={handleTemplateUpload}
+          style={{ display: 'none' }}
+        />
+      </label>
+
+      {/* Pending approval */}
+      {pendingTemplates.filter(t => t.status === 'pending_approval').length > 0 && (
+        <div style={{ ...styles.section, background: brand.orangeLight, border: `1.5px solid ${brand.orange}`, marginBottom: '24px' }}>
+          <h3 style={{ ...styles.sectionTitle, color: brand.warningText, borderBottomColor: brand.orange }}>
+            <Icons.AlertTriangle size={14} style={{ marginRight: '8px' }} />
+            {language === 'en' ? 'Pending Approval' : 'En Attente d\'Approbation'}
+            <span style={{ ...styles.badge('warning'), marginLeft: 'auto' }}>
+              {pendingTemplates.filter(t => t.status === 'pending_approval').length}
+            </span>
+          </h3>
+          {pendingTemplates.filter(t => t.status === 'pending_approval').map(tmpl => (
+            <div key={tmpl.id} style={{
+              ...styles.listItem,
+              background: brand.white,
+              border: `1px solid ${brand.warningBdr}`,
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1 }}>
+                <Icons.File size={16} style={{ color: brand.orange }} />
+                <div>
+                  <div style={{ fontSize: '13px', fontWeight: '600' }}>{tmpl.fileName}</div>
+                  <div style={{ fontSize: '11px', color: brand.gray600 }}>
+                    {tmpl.fieldCount} {language === 'en' ? 'fields' : 'champs'} &middot;
+                    {tmpl.detectedFormType && ` ${language === 'en' ? 'Detected:' : 'Détecté:'} ${formSchemas[tmpl.detectedFormType]?.name[language] || tmpl.detectedFormType} (${tmpl.detectedConfidence}%)`}
+                  </div>
+                </div>
+              </div>
+              <button
+                style={{ ...styles.button, ...styles.blueButton, fontSize: '11px', padding: '6px 14px' }}
+                onClick={() => {
+                  setCurrentPendingTemplate(tmpl);
+                  setShowTemplateApproval(true);
+                }}
+              >
+                {language === 'en' ? 'Review' : 'Examiner'}
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Built-in templates */}
+      <div style={styles.section}>
+        <h3 style={styles.sectionTitle}>
+          <Icons.FileText size={14} style={{ marginRight: '8px' }} />
+          {language === 'en' ? 'Built-in Templates' : 'Modèles Intégrés'}
+          <span style={{
+            marginLeft: 'auto', fontSize: '11px', fontWeight: '600', color: brand.gray400,
+            fontFamily: brand.fontBody, textTransform: 'uppercase',
+          }}>
+            {Object.keys(formSchemas).length} {language === 'en' ? 'forms' : 'formulaires'}
+          </span>
+        </h3>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          {Object.entries(formSchemas).map(([key, form]) => {
+            const hasCustom = !!pdfTemplates[key];
+            return (
+              <div key={key} style={{
+                ...styles.listItem,
+                padding: '12px 16px',
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1 }}>
+                  <div style={{
+                    width: '32px', height: '32px', borderRadius: '6px', minWidth: '32px',
+                    background: hasCustom ? `${brand.success}12` : brand.gray100,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    <Icons.FileText size={14} style={{ color: hasCustom ? brand.success : brand.gray600 }} />
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: '13px', fontWeight: '500', color: brand.gray900 }}>
+                      {form.name[language]}
+                    </div>
+                    <div style={{ fontSize: '11px', color: brand.gray400 }}>
+                      {form.sections.length} {language === 'en' ? 'sections' : 'sections'} &middot; {form.sections.reduce((acc, s) => acc + s.fields.length, 0)} {language === 'en' ? 'fields' : 'champs'}
+                      {hasCustom && (
+                        <span style={{ color: brand.success, marginLeft: '6px' }}>
+                          &middot; {language === 'en' ? 'Custom template loaded' : 'Modèle personnalisé'}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: '6px' }}>
+                  {hasCustom && (
+                    <span style={{ ...styles.badge('success'), fontSize: '10px' }}>
+                      {pdfTemplates[key].fields.length} {language === 'en' ? 'mapped' : 'mappés'}
+                    </span>
+                  )}
+                  <button
+                    style={{ ...styles.button, ...styles.secondaryButton, fontSize: '11px', padding: '5px 12px', textTransform: 'none' }}
+                    onClick={() => {
+                      setSelectedForm(key);
+                      setActivePage('transcription');
+                      setCurrentStep(4);
+                    }}
+                  >
+                    {language === 'en' ? 'Use' : 'Utiliser'}
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Uploaded/custom templates */}
+      {Object.keys(pdfTemplates).length > 0 && (
+        <div style={styles.section}>
+          <h3 style={styles.sectionTitle}>
+            <Icons.Cloud size={14} style={{ marginRight: '8px' }} />
+            {language === 'en' ? 'Custom Uploaded Templates' : 'Modèles Personnalisés Téléchargés'}
+            <span style={{ marginLeft: 'auto', fontSize: '11px', fontWeight: '600', color: brand.gray400, fontFamily: brand.fontBody }}>
+              {Object.keys(pdfTemplates).length}
+            </span>
+          </h3>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            {Object.entries(pdfTemplates).map(([formId, template]) => (
+              <div key={formId} style={styles.listItem}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: 1 }}>
+                  <Icons.File size={14} style={{ color: brand.success }} />
+                  <div>
+                    <div style={{ fontSize: '13px', fontWeight: '500' }}>
+                      {formSchemas[formId]?.name[language] || formId}
+                    </div>
+                    <div style={{ fontSize: '11px', color: brand.gray400 }}>
+                      {template.fileName} &middot; {template.fields.length} {language === 'en' ? 'fields' : 'champs'}
+                      {template.approvedAt && ` &middot; ${new Date(template.approvedAt).toLocaleDateString()}`}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
+  // ============================================================================
+  // SETTINGS PAGE
+  // ============================================================================
+  const renderSettings = () => (
+    <div>
+      <h2 style={styles.stepTitle}>
+        {language === 'en' ? 'Settings' : 'Paramètres'}
+      </h2>
+      <p style={styles.stepDescription}>
+        {language === 'en' ? 'Configure your transcription suite preferences' : 'Configurez vos préférences de transcription'}
+      </p>
+
+      <div style={styles.section}>
+        <h3 style={styles.sectionTitle}>
+          <Icons.Globe size={14} style={{ marginRight: '8px' }} />
+          {language === 'en' ? 'Language' : 'Langue'}
+        </h3>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button
+            style={{ ...styles.button, ...(language === 'en' ? styles.blueButton : styles.secondaryButton) }}
+            onClick={() => setLanguage('en')}
+          >
+            English
+          </button>
+          <button
+            style={{ ...styles.button, ...(language === 'fr' ? styles.blueButton : styles.secondaryButton) }}
+            onClick={() => setLanguage('fr')}
+          >
+            Français
+          </button>
+        </div>
+      </div>
+
+      <div style={styles.section}>
+        <h3 style={styles.sectionTitle}>
+          <Icons.Shield size={14} style={{ marginRight: '8px' }} />
+          {language === 'en' ? 'Security' : 'Sécurité'}
+        </h3>
+        <p style={{ fontSize: '13px', color: brand.gray600, marginBottom: '12px' }}>
+          {language === 'en' ? 'Session auto-locks after 2 minutes of inactivity. PIN: 1234 (demo).' : 'La session se verrouille automatiquement après 2 minutes d\'inactivité. NIP: 1234 (démo).'}
+        </p>
+        <button
+          style={{ ...styles.button, ...styles.dangerButton }}
+          onClick={() => setIsLocked(true)}
+        >
+          <Icons.Lock size={14} />
+          {language === 'en' ? 'Lock Session Now' : 'Verrouiller Maintenant'}
+        </button>
+      </div>
+
+      <div style={styles.section}>
+        <h3 style={styles.sectionTitle}>
+          <Icons.Chart size={14} style={{ marginRight: '8px' }} />
+          {language === 'en' ? 'Reset Statistics' : 'Réinitialiser les Statistiques'}
+        </h3>
+        <button
+          style={{ ...styles.button, ...styles.secondaryButton }}
+          onClick={() => {
+            const reset = { totalPatients: 0, totalRecordings: 0, totalHours: 0, sessionsToday: 0, sessionsThisWeek: 0, lastSessionDate: null, dailyLog: [] };
+            setUsageStats(reset);
+            localStorage.setItem('ams_usage_stats', JSON.stringify(reset));
+            addAlert('info', language === 'en' ? 'Statistics reset' : 'Statistiques réinitialisées');
+          }}
+        >
+          <Icons.Trash size={14} />
+          {language === 'en' ? 'Reset All Stats' : 'Réinitialiser'}
+        </button>
+      </div>
+    </div>
+  );
+
+  // ============================================================================
+  // PRIVACY POLICY PAGE
+  // ============================================================================
+  const renderPrivacy = () => (
+    <div>
+      <h2 style={styles.stepTitle}>
+        {language === 'en' ? 'Privacy Policy' : 'Politique de Confidentialité'}
+      </h2>
+      <p style={styles.stepDescription}>
+        {language === 'en' ? 'How we handle your data' : 'Comment nous traitons vos données'}
+      </p>
+
+      <div style={styles.section}>
+        <h3 style={styles.sectionTitle}>
+          <Icons.Shield size={14} style={{ marginRight: '8px' }} />
+          {language === 'en' ? 'Data Handling' : 'Traitement des Données'}
+        </h3>
+        <div style={{ fontSize: '13px', color: brand.gray800, lineHeight: '1.7' }}>
+          <p style={{ marginBottom: '12px' }}>
+            {language === 'en'
+              ? 'AMS Transcription Suite processes all data locally in your browser. No patient data is transmitted to external servers.'
+              : 'La Suite de Transcription AMS traite toutes les données localement dans votre navigateur. Aucune donnée patient n\'est transmise à des serveurs externes.'}
+          </p>
+          <p style={{ marginBottom: '12px' }}>
+            {language === 'en'
+              ? 'Audio recordings, clinical notes, and PDF documents remain on your device until explicitly exported or submitted through approved channels.'
+              : 'Les enregistrements audio, les notes cliniques et les documents PDF restent sur votre appareil jusqu\'à ce qu\'ils soient explicitement exportés ou soumis par des canaux approuvés.'}
+          </p>
+          <p>
+            {language === 'en'
+              ? 'This application is designed to comply with Quebec privacy regulations (Loi 25) and Canadian healthcare data protection standards.'
+              : 'Cette application est conçue pour se conformer aux réglementations québécoises sur la vie privée (Loi 25) et aux normes canadiennes de protection des données de santé.'}
+          </p>
+        </div>
+      </div>
+
+      <div style={styles.section}>
+        <h3 style={styles.sectionTitle}>
+          <Icons.Lock size={14} style={{ marginRight: '8px' }} />
+          {language === 'en' ? 'Security Measures' : 'Mesures de Sécurité'}
+        </h3>
+        <div style={{ fontSize: '13px', color: brand.gray800, lineHeight: '1.7' }}>
+          <ul style={{ paddingLeft: '18px' }}>
+            <li>{language === 'en' ? 'Automatic session lock after 2 minutes of inactivity' : 'Verrouillage automatique de session après 2 minutes d\'inactivité'}</li>
+            <li>{language === 'en' ? 'Compliance-based session auto-lock (2 min inactivity)' : 'Verrouillage automatique de conformité (2 min d\'inactivité)'}</li>
+            <li>{language === 'en' ? 'Human-in-the-Loop (HITL) approval gates' : 'Portes d\'approbation humaine (HITL)'}</li>
+            <li>{language === 'en' ? 'No external API calls with patient data' : 'Aucun appel API externe avec des données patient'}</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  );
+
+  // ============================================================================
+  // HOW IT WORKS PAGE
+  // ============================================================================
+  const renderHowItWorks = () => {
+    const flowSteps = language === 'en' ? [
+      {
+        num: '1',
+        title: 'Patient Consent',
+        icon: Icons.Shield,
+        desc: 'Enter patient information (name, ID, date of birth). Click Next to trigger the electronic consent popup — the patient\'s name is pre-filled automatically. The patient checks "I agree" to unlock the workflow.',
+        color: brand.blue,
+      },
+      {
+        num: '2',
+        title: 'Audio Recording',
+        icon: Icons.Mic,
+        desc: 'Record the clinical session directly in-browser using the MediaRecorder API, or upload a pre-recorded audio file. The recording captures the full consultation for transcription.',
+        color: brand.orange,
+      },
+      {
+        num: '3',
+        title: 'Clinical Notes → PDF Population',
+        icon: Icons.FileText,
+        desc: 'Review and edit transcribed clinical notes. Select a PDF template (e.g., McKenzie Lumbar, Knee Evaluation, Berg Balance). Each form field you fill here directly populates the corresponding field in the PDF template — this is form population, not just data entry.',
+        color: brand.blue,
+      },
+      {
+        num: '4',
+        title: 'PDF Generation',
+        icon: Icons.File,
+        desc: 'The system uses pdf-lib to open the selected PDF template and fill every mapped field with the data from Step 3. You can preview the populated PDF, adjust settings (page size, margins), and regenerate as needed.',
+        color: brand.orange,
+      },
+      {
+        num: '5',
+        title: 'Documentation Bundle',
+        icon: Icons.Package,
+        desc: 'All artifacts — consent record, audio file, clinical notes, and populated PDF — are bundled together. A Human-in-the-Loop (HITL) approval gate ensures a clinician reviews and approves before final submission.',
+        color: brand.blue,
+      },
+    ] : [
+      {
+        num: '1',
+        title: 'Consentement du Patient',
+        icon: Icons.Shield,
+        desc: 'Entrez les informations du patient (nom, ID, date de naissance). Cliquez sur Suivant pour déclencher la fenêtre de consentement électronique — le nom du patient est pré-rempli automatiquement. Le patient coche « J\'accepte » pour débloquer le flux.',
+        color: brand.blue,
+      },
+      {
+        num: '2',
+        title: 'Enregistrement Audio',
+        icon: Icons.Mic,
+        desc: 'Enregistrez la session clinique directement dans le navigateur via l\'API MediaRecorder, ou téléchargez un fichier audio pré-enregistré.',
+        color: brand.orange,
+      },
+      {
+        num: '3',
+        title: 'Notes Cliniques → Population PDF',
+        icon: Icons.FileText,
+        desc: 'Révisez et modifiez les notes cliniques transcrites. Sélectionnez un modèle PDF. Chaque champ que vous remplissez ici remplit directement le champ correspondant dans le modèle PDF — c\'est de la population de formulaire, pas simplement de la saisie de données.',
+        color: brand.blue,
+      },
+      {
+        num: '4',
+        title: 'Génération PDF',
+        icon: Icons.File,
+        desc: 'Le système utilise pdf-lib pour ouvrir le modèle PDF sélectionné et remplir chaque champ avec les données de l\'étape 3. Vous pouvez prévisualiser, ajuster et régénérer.',
+        color: brand.orange,
+      },
+      {
+        num: '5',
+        title: 'Dossier de Documentation',
+        icon: Icons.Package,
+        desc: 'Tous les éléments — consentement, audio, notes et PDF rempli — sont regroupés. Une porte d\'approbation HITL assure une révision clinicienne avant la soumission finale.',
+        color: brand.blue,
+      },
+    ];
+
+    return (
+      <div>
+        <h2 style={styles.stepTitle}>
+          {language === 'en' ? 'How It Works' : 'Comment ça Marche'}
+        </h2>
+        <p style={styles.stepDescription}>
+          {language === 'en'
+            ? 'Complete workflow from patient consent to finalized documentation bundle'
+            : 'Flux de travail complet du consentement patient au dossier finalisé'}
+        </p>
+
+        {/* Flow diagram */}
+        <div style={{ position: 'relative', marginTop: '24px' }}>
+          {flowSteps.map((step, idx) => {
+            const StepIcon = step.icon;
+            return (
+              <div key={idx} style={{ display: 'flex', marginBottom: idx < flowSteps.length - 1 ? '0' : '0' }}>
+                {/* Left column: number + connector line */}
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '48px', flexShrink: 0 }}>
+                  <div style={{
+                    width: '40px', height: '40px', borderRadius: '50%',
+                    background: step.color, color: brand.white,
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontFamily: brand.fontHeading, fontWeight: '700', fontSize: '16px',
+                    boxShadow: `0 2px 8px ${step.color}40`,
+                  }}>
+                    {step.num}
+                  </div>
+                  {idx < flowSteps.length - 1 && (
+                    <div style={{
+                      width: '2px', flex: 1, minHeight: '24px',
+                      background: `linear-gradient(to bottom, ${step.color}, ${flowSteps[idx + 1].color})`,
+                    }} />
+                  )}
+                </div>
+
+                {/* Right column: content card */}
+                <div style={{
+                  ...styles.section,
+                  flex: 1, marginLeft: '16px', marginBottom: idx < flowSteps.length - 1 ? '8px' : '0',
+                }}>
+                  <h3 style={{ ...styles.sectionTitle, display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <StepIcon size={16} style={{ color: step.color }} />
+                    {step.title}
+                  </h3>
+                  <p style={{ fontSize: '13px', color: brand.gray700, lineHeight: '1.7' }}>
+                    {step.desc}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Key concepts */}
+        <div style={{ ...styles.section, marginTop: '24px' }}>
+          <h3 style={styles.sectionTitle}>
+            <Icons.Info size={14} style={{ marginRight: '8px', color: brand.blue }} />
+            {language === 'en' ? 'Key Concepts' : 'Concepts Clés'}
+          </h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '12px', marginTop: '12px' }}>
+            {[
+              {
+                title: language === 'en' ? 'PDF Population' : 'Population PDF',
+                desc: language === 'en'
+                  ? 'Clinical notes and form fields from Step 3 are mapped directly to fields in the PDF template. Each form schema defines pdfField mappings that correspond to the fillable fields in the template.'
+                  : 'Les notes cliniques et les champs du formulaire de l\'étape 3 sont directement mappés aux champs du modèle PDF.',
+                icon: Icons.FileText,
+              },
+              {
+                title: language === 'en' ? 'HITL Approval' : 'Approbation HITL',
+                desc: language === 'en'
+                  ? 'Human-in-the-Loop gates ensure a clinician reviews every generated document before it is finalized. No automated submission without human verification.'
+                  : 'Les portes HITL garantissent qu\'un clinicien révise chaque document avant finalisation.',
+                icon: Icons.CheckCircle,
+              },
+              {
+                title: language === 'en' ? 'Bilingual Support' : 'Support Bilingue',
+                desc: language === 'en'
+                  ? 'Full EN/FR support throughout the application, including Quebec French medical terminology and compliance with Loi 25.'
+                  : 'Support complet EN/FR incluant la terminologie médicale québécoise et la conformité à la Loi 25.',
+                icon: Icons.Globe,
+              },
+              {
+                title: language === 'en' ? 'Custom Templates' : 'Modèles Personnalisés',
+                desc: language === 'en'
+                  ? 'Physiotherapists can upload their own fielded PDF templates via the PDF Manager. Uploaded templates are available to the uploader immediately; global automation requires admin approval.'
+                  : 'Les physiothérapeutes peuvent télécharger leurs propres modèles PDF via le Gestionnaire PDF. Disponibles immédiatement pour l\'utilisateur; l\'automatisation globale nécessite l\'approbation admin.',
+                icon: Icons.Upload,
+              },
+            ].map((concept, idx) => {
+              const ConceptIcon = concept.icon;
+              return (
+                <div key={idx} style={{
+                  padding: '14px', background: brand.gray50,
+                  border: `1px solid ${brand.gray200}`, borderRadius: brand.radius,
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                    <ConceptIcon size={14} style={{ color: brand.blue }} />
+                    <span style={{ fontFamily: brand.fontHeading, fontWeight: '600', fontSize: '13px', color: brand.gray900 }}>
+                      {concept.title}
+                    </span>
+                  </div>
+                  <p style={{ fontSize: '12px', color: brand.gray600, lineHeight: '1.6' }}>{concept.desc}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  // ============================================================================
+  // RENDER ACTIVE PAGE CONTENT
+  // ============================================================================
+  const renderActivePage = () => {
+    switch (activePage) {
+      case 'dashboard': return renderDashboard();
+      case 'pdfManager': return renderPdfManager();
+      case 'settings': return renderSettings();
+      case 'privacy': return renderPrivacy();
+      case 'howItWorks': return renderHowItWorks();
+      case 'transcription':
+      default:
+        return (
+          <>
+            {renderProgressBar()}
+            <div style={styles.content}>
+              {renderCurrentStep()}
+              <div style={styles.buttonGroup}>
+                <button
+                  style={{
+                    ...styles.button,
+                    ...styles.secondaryButton,
+                    ...(currentStep === 1 ? styles.disabledButton : {})
+                  }}
+                  onClick={prevStep}
+                  disabled={currentStep === 1}
+                >
+                  <Icons.ArrowLeft size={14} />
+                  {t('previous')}
+                </button>
+                {currentStep < 5 ? (
+                  <button
+                    style={{
+                      ...styles.button,
+                      ...styles.primaryButton,
+                      ...(!validateStep(currentStep) ? styles.disabledButton : {})
+                    }}
+                    onClick={nextStep}
+                  >
+                    {t('next')}
+                    <Icons.ArrowRight size={14} />
+                  </button>
+                ) : (
+                  <button
+                    style={{
+                      ...styles.button,
+                      ...styles.successButton,
+                      ...(bundleData.approvalStatus !== 'approved' ? styles.disabledButton : {})
+                    }}
+                    disabled={bundleData.approvalStatus !== 'approved'}
+                    onClick={() => {
+                      setBundleData(prev => ({ ...prev, status: 'submitted' }));
+                      addAlert('success', 'Documentation bundle finalized');
+                    }}
+                  >
+                    <Icons.Send size={14} />
+                    {t('submitBundle')}
+                  </button>
+                )}
+              </div>
+            </div>
+          </>
+        );
+    }
+  };
+
+  // ============================================================================
+  // SIDEBAR NAVIGATION ITEMS
+  // ============================================================================
+  const sidebarItems = [
+    { id: 'dashboard', icon: Icons.Chart, label: { en: 'Dashboard', fr: 'Tableau de Bord' } },
+    { id: 'transcription', icon: Icons.Mic, label: { en: 'Transcription', fr: 'Transcription' } },
+    { id: 'pdfManager', icon: Icons.Folder, label: { en: 'PDF Templates', fr: 'Modèles PDF' } },
+    { id: 'settings', icon: Icons.Settings, label: { en: 'Settings', fr: 'Paramètres' } },
+    { id: 'privacy', icon: Icons.Shield, label: { en: 'Privacy Policy', fr: 'Confidentialité' } },
+    { id: 'howItWorks', icon: Icons.Book, label: { en: 'How It Works', fr: 'Comment ça Marche' } },
+  ];
 
   // ============================================================================
   // MAIN RENDER
@@ -3475,97 +4684,219 @@ export default function AMSTranscriptionSuite() {
           }
 
           input:focus, textarea:focus, select:focus {
-            border-color: #667eea !important;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+            border-color: ${brand.blue} !important;
+            box-shadow: 0 0 0 3px rgba(0, 117, 183, 0.15) !important;
           }
 
           button:hover:not(:disabled) {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            filter: brightness(1.05);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
           }
 
           button:active:not(:disabled) {
-            transform: translateY(0);
+            filter: brightness(0.97);
+          }
+
+          /* Progress step hover */
+          .ams-progress-step:hover {
+            background: ${brand.gray50};
+          }
+
+          /* Upload zone hover */
+          .ams-upload-zone:hover {
+            background: #dceefb !important;
+            border-color: ${brand.blueDark} !important;
+          }
+
+          /* List item hover */
+          .ams-list-item:hover {
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+          }
+
+          /* Custom checkbox accent */
+          input[type="checkbox"] {
+            accent-color: ${brand.blue};
+          }
+
+          /* Audio player styling */
+          audio {
+            border-radius: 6px;
+            background: ${brand.gray50};
+          }
+
+          /* Print-friendly */
+          @media print {
+            body { background: white; }
           }
         `}
       </style>
 
+      {/* ---- TOAST ALERTS ---- */}
       {renderAlerts()}
       {isLocked && renderLockScreen()}
       {showTimeoutWarning && !isLocked && renderTimeoutWarning()}
       {renderTemplateApprovalModal()}
+      {renderConsentPopup()}
 
-      <div style={styles.card}>
-        <header style={styles.header}>
-          <div>
-            <h1 style={styles.title}>{t('appTitle')}</h1>
-            <p style={styles.subtitle}>{t('subtitle')}</p>
+      {/* ---- TOP NAVIGATION BAR ---- */}
+      <nav style={styles.topBar}>
+        <div style={styles.topBarInner}>
+          <div style={styles.logoArea}>
+            <img
+              src="/ams-logo.png"
+              alt="AMS Centre Médical et de Réadaptation"
+              style={{ height: '46px', width: 'auto' }}
+            />
+            <div style={{
+              width: '1px',
+              height: '32px',
+              background: 'rgba(255,255,255,0.25)',
+              marginLeft: '4px',
+            }} />
+            <span style={{
+              fontFamily: brand.fontHeading,
+              fontSize: '22px',
+              fontWeight: '700',
+              color: brand.white,
+              letterSpacing: '-0.5px',
+            }}>
+              Transcription Suite
+            </span>
           </div>
           <div style={styles.headerControls}>
             <button
-              style={styles.langToggle}
+              style={styles.headerBtn}
               onClick={() => setLanguage(lang => lang === 'en' ? 'fr' : 'en')}
+              title={language === 'en' ? 'Passer au français' : 'Switch to English'}
             >
-              <Icons.Globe size={14} style={{ marginRight: '4px' }} />
+              <Icons.Globe size={14} />
               {language === 'en' ? 'FR' : 'EN'}
             </button>
             <button
-              style={{ ...styles.langToggle, background: 'rgba(220, 53, 69, 0.2)', borderColor: 'rgba(220, 53, 69, 0.4)' }}
+              style={{ ...styles.headerBtn, ...styles.headerBtnDanger }}
               onClick={() => setIsLocked(true)}
+              title={language === 'en' ? 'Lock session' : 'Verrouiller la session'}
             >
-              <Icons.Lock size={14} style={{ marginRight: '4px' }} />
-              Lock
+              <Icons.Lock size={14} />
             </button>
-          </div>
-        </header>
-
-        {renderProgressBar()}
-
-        <div style={styles.content}>
-          {renderCurrentStep()}
-
-          <div style={styles.buttonGroup}>
-            <button
-              style={{
-                ...styles.button,
-                ...styles.secondaryButton,
-                ...(currentStep === 1 ? styles.disabledButton : {})
-              }}
-              onClick={prevStep}
-              disabled={currentStep === 1}
-            >
-              {t('previous')}
-            </button>
-
-            {currentStep < 5 ? (
-              <button
-                style={{
-                  ...styles.button,
-                  ...styles.primaryButton,
-                  ...(!validateStep(currentStep) ? styles.disabledButton : {})
-                }}
-                onClick={nextStep}
-              >
-                {t('next')}
-              </button>
-            ) : (
-              <button
-                style={{
-                  ...styles.button,
-                  ...styles.successButton,
-                  ...(bundleData.approvalStatus !== 'approved' ? styles.disabledButton : {})
-                }}
-                disabled={bundleData.approvalStatus !== 'approved'}
-                onClick={() => {
-                  setBundleData(prev => ({ ...prev, status: 'submitted' }));
-                  addAlert('success', 'Documentation bundle finalized');
-                }}
-              >
-                {t('submitBundle')}
-              </button>
-            )}
           </div>
         </div>
+      </nav>
+
+      {/* ---- APP BODY: SIDEBAR + CONTENT ---- */}
+      <div style={{
+        display: 'flex',
+        minHeight: 'calc(100vh - 68px)',
+      }}>
+        {/* ---- LEFT SIDEBAR ---- */}
+        <aside style={{
+          width: sidebarCollapsed ? '60px' : '220px',
+          background: brand.white,
+          borderRight: `1px solid ${brand.gray200}`,
+          display: 'flex',
+          flexDirection: 'column',
+          transition: 'width 0.2s ease',
+          flexShrink: 0,
+          position: 'sticky',
+          top: '68px',
+          height: 'calc(100vh - 68px)',
+          overflow: 'hidden',
+        }}>
+          {/* Sidebar toggle */}
+          <button
+            onClick={() => setSidebarCollapsed(prev => !prev)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: sidebarCollapsed ? 'center' : 'flex-end',
+              padding: '12px 16px',
+              background: 'none',
+              border: 'none',
+              borderBottom: `1px solid ${brand.gray200}`,
+              cursor: 'pointer',
+              color: brand.gray400,
+              transition: 'color 0.15s',
+            }}
+            title={sidebarCollapsed ? 'Expand' : 'Collapse'}
+          >
+            {sidebarCollapsed
+              ? <Icons.ArrowRight size={14} />
+              : <Icons.ArrowLeft size={14} />
+            }
+          </button>
+
+          {/* Nav items */}
+          <nav style={{ flex: 1, padding: '8px', display: 'flex', flexDirection: 'column', gap: '2px' }}>
+            {sidebarItems.map(item => {
+              const ItemIcon = item.icon;
+              const isActive = activePage === item.id;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => setActivePage(item.id)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    padding: sidebarCollapsed ? '10px' : '10px 14px',
+                    borderRadius: brand.radius,
+                    border: 'none',
+                    background: isActive ? brand.blueLight : 'transparent',
+                    color: isActive ? brand.blue : brand.gray600,
+                    cursor: 'pointer',
+                    fontSize: '13px',
+                    fontWeight: isActive ? '600' : '500',
+                    fontFamily: brand.fontBody,
+                    transition: 'all 0.15s ease',
+                    textAlign: 'left',
+                    justifyContent: sidebarCollapsed ? 'center' : 'flex-start',
+                    width: '100%',
+                    whiteSpace: 'nowrap',
+                  }}
+                  title={item.label[language]}
+                >
+                  <ItemIcon size={16} style={{ flexShrink: 0 }} />
+                  {!sidebarCollapsed && <span>{item.label[language]}</span>}
+                </button>
+              );
+            })}
+          </nav>
+
+          {/* Sidebar footer */}
+          {!sidebarCollapsed && (
+            <div style={{
+              padding: '12px 16px',
+              borderTop: `1px solid ${brand.gray200}`,
+              fontSize: '10px',
+              color: brand.gray400,
+              lineHeight: '1.4',
+            }}>
+              AMS v4.0
+            </div>
+          )}
+        </aside>
+
+        {/* ---- MAIN CONTENT AREA ---- */}
+        <main style={{ flex: 1, minWidth: 0 }}>
+          <div style={{
+            maxWidth: '1060px',
+            margin: '0 auto',
+            padding: '24px 28px 48px',
+          }}>
+            <div style={{
+              ...styles.card,
+              ...(activePage !== 'transcription' ? { padding: '0' } : {}),
+            }}>
+              {activePage !== 'transcription' ? (
+                <div style={styles.content}>
+                  {renderActivePage()}
+                </div>
+              ) : (
+                renderActivePage()
+              )}
+            </div>
+          </div>
+        </main>
       </div>
     </div>
   );

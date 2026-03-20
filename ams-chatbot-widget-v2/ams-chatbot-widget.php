@@ -1,0 +1,262 @@
+<?php
+/**
+ * Plugin Name: AMS Chatbot Widget
+ * Description: Adds the AMS Voiceflow chatbot floating widget with peekaboo bubble, typing dots, and wobble animations.
+ * Version: 2.0.0
+ * Author: AMS
+ */
+if (!defined('ABSPATH')) exit;
+
+/* Resolve the plugin's own URL so all assets load locally */
+define('AMS_CHAT_URL', plugin_dir_url(__FILE__));
+
+add_action('wp_footer', function() {
+  $base = AMS_CHAT_URL;
+?>
+<!-- AMS Voiceflow Chat Widget v2 -->
+<button id="chatToggleBtn" aria-label="Open chat">
+  <span class="chat-icon-wrap">
+    <img src="<?php echo $base; ?>assets/chatbotpix.png" alt="Open chat" class="chat-robot" />
+    <img src="<?php echo $base; ?>assets/chatbotpix.png" alt="" class="chat-bubble" />
+    <span class="typing-dots">
+      <span></span><span></span><span></span>
+    </span>
+  </span>
+</button>
+
+<div id="chatBox">
+  <button type="button" id="chatCloseBtn" aria-label="Close chat" onclick="document.getElementById('chatBox').dispatchEvent(new CustomEvent('forceclose'))">&#x2715;</button>
+  <iframe
+    src="<?php echo $base; ?>assets/ams-chatbot-voiceflow.html"
+    title="AMS Virtual Assistant Chat"
+    loading="eager">
+  </iframe>
+</div>
+
+<style>
+/* BUTTON */
+#chatToggleBtn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 9998;
+  background: transparent !important;
+  border: none !important;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: wobbleFloat 4s ease-in-out infinite;
+  transition: transform .25s cubic-bezier(.34,1.56,.64,1), opacity .25s ease;
+  will-change: transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+#chatToggleBtn,
+#chatToggleBtn > .chat-icon-wrap {
+  overflow: visible !important;
+  border-radius: 0 !important;
+  mask: none !important;
+  box-shadow: none !important;
+}
+.chat-icon-wrap {
+  display: inline-flex;
+  background: transparent !important;
+  filter: drop-shadow(0 6px 12px rgba(0,0,0,0.28));
+  position: relative;
+  z-index: 1;
+  width: 150px;
+  will-change: transform, opacity;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transform: translateZ(0);
+}
+.chat-icon-wrap img {
+  width: 150px;
+  height: auto;
+  display: block;
+  background: transparent !important;
+}
+
+/* Robot layer — always visible */
+.chat-robot {
+  position: relative;
+  clip-path: polygon(55% 18%, 100% 0%, 100% 100%, 0% 100%, 0% 58%, 38% 58%);
+}
+
+/* Bubble layer — fades in/out with peekaboo */
+.chat-bubble {
+  position: absolute;
+  top: 0; left: 0;
+  clip-path: polygon(0% 0%, 62% 0%, 62% 18%, 38% 58%, 0% 58%);
+  animation: peekaboo 8s ease-in-out infinite;
+}
+
+@keyframes peekaboo {
+  0%       { opacity: 1; }
+  30%      { opacity: 1; }
+  55%      { opacity: 0; }
+  70%      { opacity: 0; }
+  74%      { opacity: 1; }
+  100%     { opacity: 1; }
+}
+
+/* TYPING DOTS — animated bouncing dots on bubble */
+.typing-dots {
+  position: absolute;
+  top: 20%; left: 5%;
+  width: 42%; height: 16%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  pointer-events: none;
+  animation: peekaboo 8s ease-in-out infinite;
+  background: transparent;
+}
+.typing-dots span {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: #fff;
+  display: block;
+  animation: typingBounce 1.4s ease-in-out infinite;
+}
+.typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+.typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes typingBounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30%           { transform: translateY(-6px); opacity: 1; }
+}
+
+/* WOBBLE + FLOAT */
+@keyframes wobbleFloat {
+  0%   { transform: translateY(0) rotate(0deg); }
+  15%  { transform: translateY(-4px) rotate(2deg); }
+  30%  { transform: translateY(-7px) rotate(-1.5deg); }
+  50%  { transform: translateY(-5px) rotate(1deg); }
+  70%  { transform: translateY(-8px) rotate(-2deg); }
+  85%  { transform: translateY(-3px) rotate(1.5deg); }
+  100% { transform: translateY(0) rotate(0deg); }
+}
+
+#chatToggleBtn:hover {
+  animation: none;
+  transform: translateY(-4px) scale(1.06);
+}
+#chatToggleBtn:active {
+  transform: translateY(1px) scale(0.96);
+}
+#chatToggleBtn:focus-visible {
+  outline: 3px solid #1a73e8;
+  outline-offset: 4px;
+  border-radius: 8px;
+}
+
+/* CLOSE BUTTON (fallback for mobile) */
+#chatCloseBtn {
+  display: none;
+  position: absolute; top: 8px; right: 8px; z-index: 10001;
+  width: 32px; height: 32px; border-radius: 50%;
+  background: rgba(0,0,0,0.5); color: #fff;
+  border: none; font-size: 16px; cursor: pointer;
+  align-items: center; justify-content: center;
+  transition: background .15s;
+}
+#chatCloseBtn:hover { background: rgba(0,0,0,0.7); }
+@media (max-width: 640px) {
+  #chatCloseBtn { display: flex; }
+}
+
+/* CHAT BOX */
+#chatBox {
+  position: fixed;
+  bottom: 18px;
+  right: 18px;
+  width: 380px;
+  height: 650px;
+  z-index: 9999;
+  opacity: 0;
+  transform: translateY(20px) scale(0.92);
+  pointer-events: none;
+  transition: opacity .35s cubic-bezier(.16,1,.3,1), transform .35s cubic-bezier(.16,1,.3,1);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.22), 0 0 0 1px rgba(255,255,255,0.08);
+  background: #fff;
+  display: none;
+}
+#chatBox.open {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+#chatBox iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+  overflow: hidden;
+  scrollbar-width: none;
+}
+#chatBox iframe::-webkit-scrollbar { display: none; }
+
+/* MOBILE */
+@media (max-width: 640px) {
+  #chatBox {
+    top: 0 !important; left: 0 !important; right: 0 !important; bottom: 0 !important;
+    width: 100vw !important; height: 100dvh !important; border-radius: 0 !important;
+  }
+  #chatToggleBtn { bottom: 20px; right: 20px; }
+}
+</style>
+
+<script>
+(function(){
+  var btn = document.getElementById("chatToggleBtn");
+  var box = document.getElementById("chatBox");
+  var scrollY = 0;
+
+  function lockScroll() {
+    scrollY = window.scrollY;
+    document.body.style.overflow = "hidden";
+    document.body.style.position = "fixed";
+    document.body.style.top = -scrollY + "px";
+    document.body.style.width = "100%";
+  }
+  function unlockScroll() {
+    setTimeout(function(){
+      document.body.style.cssText = "";
+      window.scrollTo(0, scrollY);
+    }, 350);
+  }
+
+  btn.onclick = function() {
+    if (window.innerWidth <= 640) lockScroll();
+    box.style.display = "block";
+    void box.offsetWidth;
+    box.classList.add("open");
+    btn.style.opacity = "0";
+    btn.style.pointerEvents = "none";
+    btn.style.animation = "none";
+  };
+
+  function closeChat() {
+    if (window.innerWidth <= 640) unlockScroll();
+    box.classList.remove("open");
+    setTimeout(function(){ box.style.display = "none"; }, 350);
+    btn.style.opacity = "1";
+    btn.style.pointerEvents = "auto";
+    btn.style.animation = "";
+  }
+
+  window.addEventListener("message", function(e) {
+    if (e.data && e.data.action === "closeVoiceflow") closeChat();
+  });
+
+  box.addEventListener("forceclose", closeChat);
+})();
+</script>
+<?php
+});

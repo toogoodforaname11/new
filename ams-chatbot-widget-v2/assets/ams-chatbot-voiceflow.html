@@ -1,0 +1,1311 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AMS Centre Médical – Chat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://general-runtime.voiceflow.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --pri: #0d5cc7;
+    --pri-dk: #0a3f8c;
+    --pri-lt: #2484f0;
+    --pri-glow: rgba(13, 92, 199, 0.15);
+    --acc: #eef6fc;
+    --white: #ffffff;
+    --bg: #f4f8fb;
+    --bg2: #edf3f8;
+    --text: #0f2235;
+    --text-md: #3d5a73;
+    --text-lt: #6b89a0;
+    --border: #d3e4ef;
+    --border-lt: #e8f1f7;
+    --shadow-sm: 0 1px 4px rgba(13,77,120,.06), 0 2px 10px rgba(13,77,120,.07);
+    --shadow-md: 0 4px 18px rgba(13,77,120,.10);
+    --shadow-lg: 0 12px 48px rgba(13,77,120,.14), 0 4px 16px rgba(13,77,120,.08);
+    --radius: 18px;
+  }
+
+  body {
+    font-family: 'DM Sans', 'Helvetica Neue', sans-serif;
+    background: radial-gradient(ellipse at 30% 20%, #c0d9ee 0%, #d8eaf6 40%, #eaf3f9 70%, #f2f7fb 100%);
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateX(-5px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes dotBounce {
+    0%, 80%, 100% { transform: scale(.5); opacity: .3; }
+    40% { transform: scale(1.1); opacity: 1; }
+  }
+  @keyframes pulseRing {
+    0% { transform: scale(1); opacity: .6; }
+    100% { transform: scale(1.7); opacity: 0; }
+  }
+
+  /* ── RICH CARDS (carousel) ── */
+  .bot-row--card { align-items: flex-start; }
+
+  /* Card matches bot-bubble exactly */
+  .bot-card {
+    max-width: 82%;
+    background: var(--white);
+    border-radius: 4px 15px 15px 15px;
+    border: 1px solid var(--border-lt);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    animation: slideIn .28s ease;
+  }
+
+  .card-img-wrap {
+    width: 100%; aspect-ratio: 16/9; overflow: hidden;
+    background: var(--bg2);
+  }
+  .card-img {
+    width: 100%; height: 100%; object-fit: cover;
+    display: block; transition: transform .3s;
+  }
+  .card-img:hover { transform: scale(1.03); }
+
+  .card-body {
+    padding: 10px 13px 12px;
+    display: flex; flex-direction: column; gap: 5px;
+  }
+  .card-title {
+    font-size: 13.5px; font-weight: 700; color: var(--text);
+    line-height: 1.4;
+  }
+  .card-desc {
+    font-size: 13.5px; color: var(--text); line-height: 1.68; font-weight: 400;
+  }
+  .card-desc strong { font-weight: 600; color: var(--pri-dk); }
+  .card-desc .md-list {
+    margin: 3px 0 3px 16px; padding: 0;
+    display: flex; flex-direction: column; gap: 2px;
+    list-style: disc;
+  }
+  .card-desc .md-list li {
+    font-size: 13.5px; line-height: 1.68; color: var(--text);
+  }
+  .card-desc .md-line { margin: 2px 0; }
+  .card-desc .md-heading {
+    font-size: 13.5px; font-weight: 600; color: var(--pri-dk);
+    margin: 6px 0 2px;
+  }
+  .card-desc .md-spacer { height: 5px; }
+
+  .card-btns {
+    display: flex; flex-direction: column; gap: 6px;
+    margin-top: 6px; padding-top: 8px;
+    border-top: 1px solid var(--border-lt);
+  }
+  .card-btn {
+    width: 100%;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 12px;
+    background: linear-gradient(135deg, #eef5ff, #e4edff);
+    border: 1px solid rgba(13,92,199,.18);
+    border-radius: 8px;
+    color: var(--pri); font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all .15s;
+    text-align: left; font-family: inherit;
+  }
+  .card-btn:hover {
+    background: linear-gradient(135deg, #ddeeff, #d3e6ff);
+    box-shadow: 0 2px 8px rgba(13,92,199,.15);
+    transform: translateY(-1px);
+  }
+  .card-btn:active { transform: scale(.98); }
+  .card-btn-arrow { opacity: .5; font-size: 15px; }
+
+  /* ── CAROUSEL (swipe only, no arrows) ── */
+  .carousel-row { display: flex; gap: 7px; align-items: flex-start; margin-bottom: 10px; animation: slideIn .28s ease; }
+  .carousel-wrap { position: relative; max-width: 82%; min-width: 0; }
+  .carousel-track {
+    display: flex; gap: 10px; overflow-x: auto;
+    scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch;
+    padding-bottom: 6px;
+    scrollbar-width: none; -ms-overflow-style: none;
+    cursor: grab;
+  }
+  .carousel-track:active { cursor: grabbing; }
+  .carousel-track::-webkit-scrollbar { display: none; }
+  .carousel-track .bot-card {
+    flex: 0 0 88%; max-width: 88%; scroll-snap-align: center; animation: none;
+    min-height: 0; display: flex; flex-direction: column;
+  }
+  .carousel-track .bot-card .card-body {
+    flex: 1; display: flex; flex-direction: column;
+  }
+  .carousel-track .bot-card .card-desc {
+    flex: 1;
+  }
+  .carousel-dots { display: flex; justify-content: center; gap: 6px; padding-top: 8px; }
+  .carousel-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--border); border: none; cursor: pointer;
+    transition: all .2s; padding: 0;
+  }
+  .carousel-dot.active { background: var(--pri); transform: scale(1.2); }
+
+  /* ── SCROLL-BACK ANCHOR ── */
+  .scroll-anchor {
+    display: inline-flex; align-items: center; gap: 5px;
+    margin-top: 6px;
+    padding: 4px 10px;
+    background: var(--acc);
+    border: 1px solid var(--border-lt);
+    border-radius: 12px;
+    color: var(--pri); font-size: 11px; font-weight: 500;
+    cursor: pointer; opacity: 0; animation: fadeIn .3s ease .4s forwards;
+    transition: background .15s, transform .1s;
+    font-family: inherit;
+  }
+  .scroll-anchor:hover { background: #ddeeff; transform: translateY(-1px); }
+  .scroll-anchor:active { transform: scale(.97); }
+  .scroll-anchor-icon { font-size: 13px; line-height: 1; }
+
+  /* standalone image in bubble */
+  .bot-bubble--img { padding: 4px !important; background: transparent !important; box-shadow: none !important; }
+  .chat-img { max-width: 100%; border-radius: 10px; display: block; }
+
+  /* ── MARKDOWN RENDERING ── */
+  .md-heading {
+    font-size: 13px; font-weight: 700; color: var(--pri-dk);
+    margin: 8px 0 4px; letter-spacing: .1px;
+  }
+  .md-line { margin: 1px 0; line-height: 1.55; }
+  .md-spacer { height: 6px; }
+  .md-list {
+    margin: 4px 0 4px 14px; padding: 0;
+    display: flex; flex-direction: column; gap: 3px;
+  }
+  .md-list li { line-height: 1.5; font-size: 13px; }
+
+  .md-link-btn {
+    display: flex; align-items: center; gap: 7px;
+    margin: 5px 0;
+    padding: 9px 13px;
+    background: linear-gradient(135deg, #eef5ff 0%, #e6f0ff 100%);
+    border: 1px solid rgba(13,92,199,.18);
+    border-radius: 10px;
+    color: var(--pri); font-size: 12.5px; font-weight: 500;
+    text-decoration: none; line-height: 1.35;
+    transition: background .15s, box-shadow .15s, transform .1s;
+    word-break: break-word;
+  }
+  .md-link-btn:hover {
+    background: linear-gradient(135deg, #ddeeff 0%, #d5e8ff 100%);
+    box-shadow: 0 2px 10px rgba(13,92,199,.15);
+    transform: translateY(-1px);
+  }
+  .md-link-btn:active { transform: scale(.98); }
+  .md-link-icon { font-size: 13px; flex-shrink: 0; }
+  .md-link-btn > span:nth-child(2) { flex: 1; }
+  .md-link-arrow {
+    font-size: 14px; opacity: .5; flex-shrink: 0;
+    font-style: normal;
+  }
+
+  .ams-scroll::-webkit-scrollbar { width: 4px; }
+  .ams-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 8px; }
+  .ams-scroll::-webkit-scrollbar-track { background: transparent; }
+
+  /* ── CONTAINER ── */
+  #ams-chat {
+    width: 390px; height: 650px;
+    border-radius: var(--radius);
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    background: var(--white);
+    box-shadow: var(--shadow-lg), 0 0 0 1px rgba(26,111,163,.07);
+    animation: fadeIn .5s ease;
+  }
+
+  /* ── HEADER ── */
+  .ams-header {
+    background: linear-gradient(150deg, #0a3f8c 0%, #0d5cc7 45%, #1a75e0 80%, #2484f0 100%);
+    padding: 0 13px;
+    display: flex; align-items: center; gap: 9px;
+    flex-shrink: 0; min-height: 60px;
+    position: relative; overflow: hidden; isolation: isolate;
+  }
+  .ams-header::before {
+    content: '';
+    position: absolute; inset: 0; z-index: 0; pointer-events: none;
+    background:
+      radial-gradient(ellipse 60% 80% at 70% 50%, rgba(255,255,255,.06) 0%, transparent 70%),
+      repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 18px,
+        rgba(255,255,255,.025) 18px,
+        rgba(255,255,255,.025) 19px
+      );
+  }
+  .ams-header::after {
+    content: '';
+    position: absolute; bottom: 0; left: 13px; right: 13px; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.25), transparent);
+    pointer-events: none;
+  }
+  .ams-header > * { position: relative; z-index: 1; }
+
+  .ams-header-brand {
+    display: flex; align-items: center; gap: 10px;
+    margin-right: auto; position: relative; z-index: 1;
+  }
+  .ams-header img.logo {
+    height: 40px; width: 40px; object-fit: contain;
+    border-radius: 8px;
+    filter: drop-shadow(0 1px 3px rgba(0,0,0,.2));
+  }
+  .ams-header-titles {
+    display: flex; flex-direction: column; gap: 2px;
+  }
+  .ams-header-name {
+    font-size: 15px; font-weight: 700; color: #fff;
+    line-height: 1.2; letter-spacing: .1px;
+    text-shadow: 0 1px 3px rgba(0,0,0,.15);
+  }
+  .ams-header-bottom {
+    display: flex; align-items: center; gap: 7px;
+  }
+  .ams-header-sub {
+    font-size: 11px; font-weight: 400; color: rgba(255,255,255,.75);
+    line-height: 1.2; letter-spacing: .2px;
+  }
+
+  .ams-status {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 10px; color: rgba(255,255,255,.8);
+    font-weight: 500; letter-spacing: .3px;
+    position: relative; z-index: 1;
+    white-space: nowrap; flex-shrink: 0;
+  }
+  .status-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: #4fe6b8; position: relative; flex-shrink: 0;
+  }
+  .status-dot::after {
+    content: '';
+    position: absolute; inset: -2px; border-radius: 50%;
+    background: rgba(79,230,184,.35);
+    animation: pulseRing 1.8s ease-out infinite;
+  }
+
+
+
+  .ams-hdr-btn {
+    width: 31px; height: 31px; border-radius: 8px;
+    background: rgba(255,255,255,.09); border: 1px solid rgba(255,255,255,.14);
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,.85); transition: all .18s;
+    flex-shrink: 0; position: relative; z-index: 1;
+  }
+  .ams-hdr-btn:hover { background: rgba(255,255,255,.18); color: #fff; }
+
+  /* ── SUB-HEADER ── */
+  .ams-subheader {
+    background: linear-gradient(135deg, #e8f3fd 0%, #edf6ff 100%);
+    border-bottom: 1px solid rgba(13,92,199,.08);
+    padding: 7px 14px; display: flex; align-items: center; gap: 9px; flex-shrink: 0;
+  }
+  .sub-disclaimer {
+    display: flex; align-items: center; gap: 10px; width: 100%;
+  }
+  .sub-disclaimer-text {
+    flex: 1; font-size: 11px; color: #5a7fa8; line-height: 1.45;
+  }
+  .sub-disclaimer-text strong {
+    font-weight: 500; color: #3d6490;
+  }
+  .sub-disclaimer-img {
+    width: 38px; height: 38px; object-fit: contain; flex-shrink: 0; opacity: .75;
+  }
+
+  /* ── MESSAGES ── */
+  .ams-messages {
+    flex: 1; overflow-y: auto; padding: 14px 13px 8px;
+    background: var(--bg);
+    display: flex; flex-direction: column; gap: 1px;
+    scroll-behavior: smooth;
+  }
+
+  /* ── EMPTY STATE ── */
+  .ams-empty-state {
+    flex: 1; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 10px; padding: 24px; text-align: center;
+    animation: fadeIn .4s ease;
+  }
+  .ams-empty-state .empty-icon {
+    font-size: 32px; opacity: .35;
+  }
+  .ams-empty-state .empty-title {
+    font-size: 14px; font-weight: 600; color: var(--text-md);
+  }
+  .ams-empty-state .empty-sub {
+    font-size: 12px; color: var(--text-lt); line-height: 1.5;
+  }
+
+  /* ── SKELETON LOADER ── */
+  @keyframes shimmer {
+    0%   { background-position: -300px 0; }
+    100% { background-position: 300px 0; }
+  }
+  .skeleton-row {
+    display: flex; gap: 7px; align-items: flex-end; margin-bottom: 10px;
+  }
+  .skeleton-avatar {
+    width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+    background: linear-gradient(90deg, #dce9f3 25%, #eaf3f9 50%, #dce9f3 75%);
+    background-size: 600px 100%;
+    animation: shimmer 1.4s infinite linear;
+  }
+  .skeleton-bubble {
+    height: 42px; border-radius: 4px 15px 15px 15px;
+    background: linear-gradient(90deg, #dce9f3 25%, #eaf3f9 50%, #dce9f3 75%);
+    background-size: 600px 100%;
+    animation: shimmer 1.4s infinite linear;
+  }
+  .skeleton-bubble.w60 { width: 60%; }
+  .skeleton-bubble.w80 { width: 80%; animation-delay: .2s; }
+
+  .date-divider {
+    text-align: center; margin: 4px 0 10px;
+    animation: fadeIn .4s ease;
+    display: none;
+  }
+  .date-divider.visible { display: block; }
+  .date-divider span {
+    font-size: 10.5px; color: var(--text-lt);
+    background: var(--bg2); padding: 3px 12px;
+    border-radius: 20px; border: 1px solid var(--border-lt);
+    font-weight: 500; letter-spacing: .2px;
+  }
+
+  .bot-row {
+    display: flex; gap: 7px; align-items: flex-end;
+    margin-bottom: 10px; animation: slideIn .28s ease;
+  }
+  .bot-avatar {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: #f5931e;
+    border: 1.5px solid rgba(232,131,15,.35);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; overflow: hidden;
+    box-shadow: 0 2px 8px rgba(224,112,8,.4);
+  }
+  .bot-avatar img { width: 24px; height: 24px; object-fit: contain; }
+  .bot-bubble {
+    background: var(--white);
+    border-radius: 4px 15px 15px 15px;
+    padding: 10px 13px; max-width: 82%;
+    font-size: 13.5px; line-height: 1.68; font-weight: 400;
+    color: var(--text); word-wrap: break-word;
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--border-lt);
+  }
+  .bot-bubble strong { font-weight: 600; color: var(--pri-dk); }
+  .bot-bubble a { color: var(--pri); text-decoration: none; border-bottom: 1px solid rgba(26,111,163,.22); }
+  .bot-bubble a:hover { border-color: var(--pri); }
+  .bot-bubble .line-break { min-height: 4px; }
+  .bot-bubble--reveal {
+    animation: bubbleReveal .4s ease both;
+  }
+  @keyframes bubbleReveal {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+
+
+  .user-row {
+    display: flex; justify-content: flex-end;
+    margin-bottom: 10px; animation: fadeUp .22s ease;
+  }
+  .user-bubble {
+    background: linear-gradient(150deg, #0a3f8c 0%, #0d5cc7 45%, #1a75e0 80%, #2484f0 100%);
+    border-radius: 15px 4px 15px 15px;
+    padding: 10px 14px; max-width: 78%;
+    font-size: 13.5px; line-height: 1.55; font-weight: 400;
+    color: #fff; word-wrap: break-word;
+    box-shadow: 0 2px 10px rgba(10,63,140,.3);
+  }
+
+  .typing-row {
+    display: flex; gap: 7px; align-items: flex-end;
+    margin-bottom: 10px; animation: fadeIn .2s ease;
+  }
+  .typing-bubble {
+    background: var(--white);
+    border-radius: 4px 15px 15px 15px;
+    padding: 12px 15px; display: flex; gap: 4px; align-items: center;
+    box-shadow: var(--shadow-sm); border: 1px solid var(--border-lt);
+  }
+  .typing-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--pri-lt); display: inline-block;
+  }
+  .typing-dot:nth-child(1) { animation: dotBounce 1s ease-in-out 0s infinite; }
+  .typing-dot:nth-child(2) { animation: dotBounce 1s ease-in-out .18s infinite; }
+  .typing-dot:nth-child(3) { animation: dotBounce 1s ease-in-out .36s infinite; }
+
+  /* ── BUTTONS ── */
+  .ams-buttons {
+    margin-left: 41px; margin-top: 4px; margin-bottom: 9px;
+    display: flex; flex-direction: column; align-items: flex-start;
+    gap: 6px; animation: fadeUp .28s ease;
+  }
+  .ams-btn {
+    padding: 8px 14px 8px 12px;
+    border-radius: 20px; font-size: 13px; font-weight: 600;
+    cursor: pointer; font-family: 'DM Sans', sans-serif;
+    line-height: 1.3; text-align: left;
+    display: inline-flex; align-items: center; gap: 6px;
+    transition: all .18s ease;
+    background: var(--white); color: var(--pri-dk);
+    border: 1px solid var(--border);
+    box-shadow: 0 1px 4px rgba(13,77,120,.07);
+    max-width: 82%;
+  }
+  .ams-btn-text { flex: 1; }
+  .ams-btn-arrow {
+    font-size: 15px; opacity: .3; transition: all .18s;
+    flex-shrink: 0; line-height: 1;
+  }
+  .ams-btn:hover {
+    border-color: #f5931e;
+    background: var(--white);
+    box-shadow: 0 0 0 1px rgba(245,147,30,.3), 0 3px 14px rgba(245,147,30,.2);
+    color: var(--pri-dk);
+    transform: translateY(-1px);
+  }
+  .ams-btn:hover .ams-btn-arrow { opacity: .7; }
+  .ams-btn:active { transform: scale(.97); box-shadow: 0 0 0 1px rgba(245,147,30,.2), 0 1px 6px rgba(245,147,30,.15); }
+  .ams-btn.primary {
+    background: linear-gradient(135deg, var(--pri), var(--pri-lt));
+    color: #fff; border-color: transparent;
+    box-shadow: 0 2px 8px rgba(26,111,163,.22);
+  }
+  .ams-btn.primary:hover {
+    background: linear-gradient(135deg, var(--pri-dk), var(--pri));
+    box-shadow: 0 3px 12px rgba(26,111,163,.3);
+    border-color: transparent;
+  }
+  .ams-btn.primary .ams-btn-arrow { color: rgba(255,255,255,.7); opacity: .7; }
+  .ams-btn .ams-icon {
+    width: 18px; height: 18px; object-fit: contain; flex-shrink: 0; opacity: .65;
+  }
+
+  /* ── INPUT BAR ── */
+  .ams-input-bar {
+    display: flex; gap: 7px; padding: 9px 11px;
+    border-top: 1px solid var(--border-lt);
+    background: var(--white); flex-shrink: 0; align-items: center;
+  }
+  .ams-input-bar input {
+    flex: 1; padding: 9px 16px;
+    border: 1.5px solid var(--border); border-radius: 50px;
+    font-size: 13.5px; font-family: 'DM Sans', sans-serif;
+    outline: none; color: var(--text); background: var(--bg);
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .ams-input-bar input:focus {
+    border-color: var(--pri-lt);
+    box-shadow: 0 0 0 3px var(--pri-glow);
+    background: var(--white);
+  }
+  .ams-input-bar input:disabled { color: var(--text-lt); background: var(--bg2); opacity: .7; }
+  .ams-input-bar input::placeholder { color: var(--text-lt); }
+
+  .send-btn {
+    width: 37px; height: 37px; border-radius: 10px;
+    background: linear-gradient(150deg, #0a3f8c 0%, #0d5cc7 45%, #1a75e0 80%, #2484f0 100%);
+    border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: all .15s;
+    box-shadow: 0 2px 8px rgba(10,63,140,.3);
+  }
+  .send-btn:hover:not(:disabled) {
+    background: linear-gradient(150deg, #083372 0%, #0a4fa3 45%, #1565c0 80%, #1e72d8 100%);
+    box-shadow: 0 3px 12px rgba(10,63,140,.4);
+    transform: scale(1.05);
+  }
+  .send-btn:disabled { background: #c5d8e6; cursor: default; box-shadow: none; }
+  .send-btn svg { stroke: #fff; }
+
+  /* ── FOOTER ── */
+  .ams-footer {
+    padding: 7px 14px;
+    border-top: 1px solid var(--border-lt);
+    text-align: center; background: var(--bg);
+    flex-shrink: 0; display: flex; align-items: center;
+    justify-content: center;
+  }
+  .footer-brand {
+    display: flex; align-items: baseline; gap: 4px; flex-wrap: wrap; justify-content: center;
+  }
+  .footer-ams {
+    font-size: 12px; font-weight: 800; letter-spacing: .5px;
+    background: linear-gradient(90deg, #0a3f8c, #0d5cc7, #2484f0);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text; text-transform: uppercase;
+  }
+  .footer-rest {
+    font-size: 10.5px; font-weight: 400; color: var(--text-lt);
+    letter-spacing: .2px;
+  }
+  .footer-dot-sep {
+    font-size: 13px; color: var(--text-lt); line-height: 1;
+  }
+  .footer-privacy-link {
+    font-size: 10.5px; color: var(--text-lt); text-decoration: none; font-weight: 400;
+    transition: color .15s;
+  }
+  .footer-privacy-link:hover { color: var(--pri); text-decoration: underline; }
+
+  @media (max-width: 640px) {
+    .carousel-track .bot-card { flex: 0 0 90%; max-width: 90%; }
+  }
+</style>
+</head>
+<body>
+<div id="ams-chat">
+
+  <div class="ams-header">
+    <div class="ams-header-brand">
+      <img class="logo" src="logoams.png" alt="AMS Clinic" />
+      <div class="ams-header-titles">
+        <span class="ams-header-name" id="headerName">AMS Clinique</span>
+        <div class="ams-header-bottom">
+          <span class="ams-header-sub" id="headerSub">Assistant IA</span>
+          <div class="ams-status">
+            <div class="status-dot"></div>
+            <span id="statusText">En ligne</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button class="ams-hdr-btn" onclick="resetChat()" title="Nouvelle conversation">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21.5 2v6h-6"/><path d="M21.34 15.57a10 10 0 1 1-.57-8.38"/>
+      </svg>
+    </button>
+    <button class="ams-hdr-btn" onclick="closeChat()" title="Fermer">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="ams-subheader">
+    <div class="sub-disclaimer">
+      <div class="sub-disclaimer-text" id="disclaimerText">
+        <strong>Vous parlez à un assistant IA, pas à un médecin.</strong> Je ne peux pas donner de conseils médicaux ni diagnostiquer des conditions. Pour toute question de santé personnelle, consultez toujours un professionnel de la santé qualifié.
+      </div>
+      <img src="robotams.png" alt="" class="sub-disclaimer-img" />
+    </div>
+  </div>
+
+  <div class="ams-messages ams-scroll" id="msgArea">
+    <div class="date-divider"><span id="dateLabel">Aujourd'hui</span></div>
+    <div class="ams-empty-state" id="emptyState">
+      <div class="empty-icon">💬</div>
+      <div class="empty-title" id="emptyTitle">Comment pouvons-nous vous aider?</div>
+      <div class="empty-sub" id="emptySub">Notre assistant IA est en train de se connecter...</div>
+    </div>
+    <div class="skeleton-row" id="skeletonLoader">
+      <div class="skeleton-avatar"></div>
+      <div class="skeleton-bubble w60"></div>
+    </div>
+  </div>
+
+  <form class="ams-input-bar" id="inputBar" onsubmit="handleSend(event)">
+    <input type="text" id="userInput" disabled placeholder="Veuillez patienter..." autocomplete="off" />
+    <button type="submit" class="send-btn" id="sendBtn" disabled>
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+      </svg>
+    </button>
+  </form>
+
+  <div class="ams-footer">
+    <div class="footer-brand">
+      <span class="footer-ams">AMS</span>
+      <span class="footer-rest" id="footerRest">Centre Médical et de Réadaptation</span>
+      <span class="footer-dot-sep">·</span>
+      <a class="footer-privacy-link" href="https://amsclinic.ca/privacy-policy" target="_blank" rel="noopener">Privacy Policy</a>
+    </div>
+  </div>
+</div>
+
+<script>
+function closeChat() {
+  window.parent.postMessage({ action: "closeVoiceflow" }, "*");
+}
+</script>
+
+<script>
+const VF_CONFIG = {
+  apiKey:    'VF.DM.69a355ef4871c48daf033171.SlqRZFH71ukkJIln',
+  versionID: 'production',
+  runtimeURL: 'https://general-runtime.voiceflow.com',
+  userID: 'ams-user-' + Math.random().toString(36).slice(2, 10),
+};
+
+const LOGO_SRC = "data:image/png;base64,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";
+
+const AVATAR_SRC = "robotams.png";
+
+let lang = 'fr';
+let inputEnabled = false;
+const msgArea = document.getElementById('msgArea');
+
+// Init
+
+// Date label
+(function(){
+  const now = new Date();
+  const opts = { weekday:'long', day:'numeric', month:'long' };
+  const lbl = document.getElementById('dateLabel');
+  const fr = now.toLocaleDateString('fr-CA', opts);
+  const en = now.toLocaleDateString('en-CA', opts);
+  lbl.dataset.fr = fr.charAt(0).toUpperCase() + fr.slice(1);
+  lbl.dataset.en = en.charAt(0).toUpperCase() + en.slice(1);
+  lbl.textContent = lbl.dataset.fr;
+})();
+
+function setLang(l) {
+  lang = l;
+  document.getElementById('statusText').textContent    = l==='fr' ? 'En ligne'  : 'Online';
+  document.getElementById('headerName').textContent    = l==='fr' ? 'AMS Clinique' : 'AMS Clinic';
+  document.getElementById('headerSub').textContent     = l==='fr' ? 'Assistant IA' : 'AI Assistant';
+  document.getElementById('footerRest').textContent    = l==='fr' ? 'Centre Médical et de Réadaptation' : 'Medical and Rehabilitation Centre';
+  document.getElementById('disclaimerText').innerHTML  = l==='fr'
+    ? '<strong>Vous parlez à un assistant IA, pas à un médecin.</strong> Je ne peux pas donner de conseils médicaux ni diagnostiquer des conditions. Pour toute question de santé personnelle, consultez toujours un professionnel de la santé qualifié.'
+    : '<strong>You are speaking to an AI assistant, not a doctor.</strong> I cannot give medical advice or diagnose conditions. For personal health matters, always consult a qualified healthcare provider.';
+  const emptyTitle = document.getElementById('emptyTitle');
+  const emptySub = document.getElementById('emptySub');
+  if (emptyTitle) emptyTitle.textContent = l==='fr' ? 'Comment pouvons-nous vous aider?' : 'How can we help you?';
+  if (emptySub) emptySub.textContent = l==='fr' ? 'Notre assistant IA est en train de se connecter...' : 'Our AI assistant is connecting...';
+  const lbl = document.getElementById('dateLabel');
+  lbl.textContent = lbl.dataset[l] || lbl.dataset.fr;
+  updatePlaceholder();
+}
+
+// Auto-detect language from URL param (?lang=en), html lang attribute, or postMessage from parent
+(function() {
+  const urlLang = new URLSearchParams(window.location.search).get('lang');
+  const htmlLang = document.documentElement.lang;
+  const detectedLang = urlLang || (htmlLang && htmlLang.startsWith('en') ? 'en' : null);
+  if (detectedLang === 'en') setLang('en');
+})();
+
+window.addEventListener('message', function(e) {
+  if (e.data && e.data.lang) setLang(e.data.lang);
+});
+
+// Detect Google Translate changing the html lang attribute (works when chatbot is loaded directly, not in iframe)
+(function() {
+  let lastLang = document.documentElement.lang;
+  const observer = new MutationObserver(() => {
+    const newLang = document.documentElement.lang;
+    if (newLang !== lastLang) {
+      lastLang = newLang;
+      const l = newLang.startsWith('en') ? 'en' : 'fr';
+      setLang(l);
+    }
+  });
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ['lang', 'class'] });
+})();
+
+function updatePlaceholder() {
+  const inp = document.getElementById('userInput');
+  inp.placeholder = !inputEnabled
+    ? (lang==='fr' ? 'Veuillez patienter...' : 'Please wait to type...')
+    : (lang==='fr' ? 'Tapez votre message...' : 'Type your message...');
+}
+
+function renderMd(text) {
+  if (!text) return '';
+  const lines = text.split('\n');
+  let html = '';
+  let i = 0;
+  while (i < lines.length) {
+    let line = lines[i];
+
+    // ## Heading
+    if (/^##+ (.+)/.test(line)) {
+      html += `<div class="md-heading">${escMd(line.replace(/^##+ /, ''))}</div>`;
+      i++; continue;
+    }
+    // # Heading
+    if (/^# (.+)/.test(line)) {
+      html += `<div class="md-heading">${escMd(line.replace(/^# /, ''))}</div>`;
+      i++; continue;
+    }
+    // Bullet list: - item, * item, OR • item
+    if (/^([-*•])\s+(.+)/.test(line)) {
+      html += '<ul class="md-list">';
+      while (i < lines.length && /^([-*•])\s+(.+)/.test(lines[i])) {
+        const itemText = lines[i].replace(/^([-*•])\s+/, '');
+        html += `<li>${inlineMd(itemText)}</li>`;
+        i++;
+      }
+      html += '</ul>';
+      continue;
+    }
+    // A line that CONTAINS inline • bullets (e.g. "Hours: • Mon 8am • Tue 9am")
+    // Split on • and render each segment as a list if multiple found
+    if (line.includes('•')) {
+      const parts = line.split('•').map(s => s.trim()).filter(Boolean);
+      if (parts.length > 1) {
+        // First part may be a label like "Hours:"
+        const firstIsLabel = /:\s*$/.test(parts[0]);
+        if (firstIsLabel) {
+          html += `<div class="md-line">${inlineMd(parts[0])}</div>`;
+          html += '<ul class="md-list">';
+          parts.slice(1).forEach(p => { html += `<li>${inlineMd(p)}</li>`; });
+          html += '</ul>';
+        } else {
+          html += '<ul class="md-list">';
+          parts.forEach(p => { html += `<li>${inlineMd(p)}</li>`; });
+          html += '</ul>';
+        }
+        i++; continue;
+      }
+    }
+    // Markdown link [label](url) on its own line
+    if (/^\[.+\]\(https?:\/\/.+\)$/.test(line.trim())) {
+      const m = line.trim().match(/^\[(.+?)\]\((https?:\/\/.+?)\)$/);
+      if (m) {
+        html += `<a class="md-link-btn" href="${m[2]}" target="_blank" rel="noopener"><span class="md-link-icon">🔗</span><span>${escMd(m[1])}</span><span class="md-link-arrow">↗</span></a>`;
+        i++; continue;
+      }
+    }
+    // Empty line → spacer
+    if (line.trim() === '') {
+      html += '<div class="md-spacer"></div>';
+      i++; continue;
+    }
+    // Normal paragraph line
+    html += `<div class="md-line">${inlineMd(line)}</div>`;
+    i++;
+  }
+  return html;
+}
+
+function escMd(text) {
+  return text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function inlineMd(text) {
+  return text
+    // Markdown links [label](url) inline → link button
+    .replace(/\[(.+?)\]\((https?:\/\/[^)]+)\)/g,
+      (_, label, url) => `<a class="md-link-btn" href="${url}" target="_blank" rel="noopener"><span class="md-link-icon">🔗</span><span>${escMd(label)}</span><span class="md-link-arrow">↗</span></a>`)
+    // Bold
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    // Italic
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    // Bare URLs (not already inside href)
+    .replace(/(^|[^"=])(https?:\/\/[^\s<"]+)/g,
+      (_, pre, url) => `${pre}<a class="md-link-btn" href="${url}" target="_blank" rel="noopener"><span class="md-link-icon">🔗</span><span>${url}</span><span class="md-link-arrow">↗</span></a>`);
+}
+
+let _suppressAutoScroll = false;
+
+// Duplicate output prevention: skip consecutive identical messages
+let _lastBotMessage = '';
+function isDuplicate(text) {
+  const trimmed = (text || '').trim();
+  if (!trimmed) return false;
+  if (trimmed === _lastBotMessage) return true;
+  _lastBotMessage = trimmed;
+  return false;
+}
+
+function scrollToBottom() {
+  if (_suppressAutoScroll) return;
+  requestAnimationFrame(() => { msgArea.scrollTop = msgArea.scrollHeight; });
+}
+function scrollToElement(el) {
+  if (!el) return;
+  requestAnimationFrame(() => { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); });
+}
+
+function getTimeStr() {
+  return new Date().toLocaleTimeString(lang === 'fr' ? 'fr-CA' : 'en-CA', { hour: '2-digit', minute: '2-digit' });
+}
+
+function hideEmptyState() {
+  const empty = document.getElementById('emptyState');
+  const skeleton = document.getElementById('skeletonLoader');
+  if (empty) empty.remove();
+  if (skeleton) skeleton.remove();
+  document.querySelector('.date-divider')?.classList.add('visible');
+}
+
+function addBotMessage(text) {
+  if (isDuplicate(text)) { console.log('[VF] Skipped duplicate:', text.slice(0, 60)); return Promise.resolve(); }
+  hideEmptyState();
+  const row = document.createElement('div');
+  row.className = 'bot-row';
+  const bubble = document.createElement('div');
+  bubble.className = 'bot-bubble bot-bubble--reveal';
+  bubble.innerHTML = renderMd(text);
+  row.innerHTML = `<div class="bot-avatar"><img src="${AVATAR_SRC}" alt="" /></div>`;
+  row.appendChild(bubble);
+  msgArea.appendChild(row);
+  scrollToBottom();
+
+  // Collect all text nodes for typewriter
+  const textNodes = [];
+  const walker = document.createTreeWalker(bubble, NodeFilter.SHOW_TEXT, null);
+  while (walker.nextNode()) textNodes.push(walker.currentNode);
+
+  const totalChars = textNodes.reduce((sum, n) => sum + n.textContent.length, 0);
+
+  // Short messages or no text: show instantly
+  if (totalChars < 80) {
+    return new Promise(resolve => {
+      requestAnimationFrame(() => { scrollToBottom(); resolve(); });
+    });
+  }
+
+  // Long message: add a scroll-back anchor below the bubble
+  const anchor = document.createElement('button');
+  anchor.className = 'scroll-anchor';
+  anchor.innerHTML = `<span class="scroll-anchor-icon">\u2191</span> ${lang === 'fr' ? 'Haut du message' : 'Top of message'}`;
+  anchor.addEventListener('click', () => {
+    row.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+  row.appendChild(anchor);
+
+  // Store full text, then clear for typewriter
+  const fullTexts = textNodes.map(n => n.textContent);
+  textNodes.forEach(n => { n.textContent = ''; });
+
+  // Typewriter runs in background — resolve immediately so cards/buttons aren't blocked
+  const CHAR_MS = totalChars > 200 ? 12 : 18;
+  let nodeIdx = 0, charIdx = 0;
+  if (_activeTypewriterTimer) clearInterval(_activeTypewriterTimer);
+  const timer = setInterval(() => {
+    if (nodeIdx >= textNodes.length) {
+      clearInterval(timer);
+      _activeTypewriterTimer = null;
+      scrollToBottom();
+      return;
+    }
+    const full = fullTexts[nodeIdx];
+    charIdx++;
+    textNodes[nodeIdx].textContent = full.slice(0, charIdx);
+    if (charIdx >= full.length) {
+      nodeIdx++;
+      charIdx = 0;
+    }
+    if (!_suppressAutoScroll) {
+      msgArea.scrollTop = msgArea.scrollHeight;
+    }
+  }, CHAR_MS);
+  _activeTypewriterTimer = timer;
+
+  // Resolve immediately so processTraces can continue with cards/carousels/buttons
+  return new Promise(resolve => {
+    requestAnimationFrame(() => { scrollToBottom(); resolve(); });
+  });
+}
+
+function addUserMessage(text) {
+  const row = document.createElement('div');
+  row.className = 'user-row';
+  row.innerHTML = `<div class="user-bubble">${escMd(text)}</div>`;
+  msgArea.appendChild(row); scrollToBottom();
+}
+
+function showTyping() {
+  removeTyping();
+  const row = document.createElement('div');
+  row.className = 'typing-row'; row.id = 'typingIndicator';
+  row.innerHTML = `<div class="bot-avatar"><img src="${AVATAR_SRC}" alt=""/></div><div class="typing-bubble"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div>`;
+  msgArea.appendChild(row); scrollToBottom();
+}
+
+function removeTyping() {
+  const el = document.getElementById('typingIndicator'); if(el) el.remove();
+}
+
+function clearButtons() {
+  const old = document.getElementById('amsButtons'); if(old) old.remove();
+}
+
+function buildCardElement(card) {
+  const imageUrl = null;
+  const title    = card.title || '';
+  const desc     = card.description?.text || card.description || card.body || '';
+
+  const cardEl = document.createElement('div');
+  cardEl.className = 'bot-card';
+
+  let inner = '';
+  if (imageUrl) {
+    inner += `<div class="card-img-wrap"><img src="${imageUrl}" class="card-img" alt="${title}" loading="lazy" onerror="this.parentElement.style.display='none'"/></div>`;
+  }
+  let body = '';
+  if (title) body += `<div class="card-title">${escMd(title)}</div>`;
+  if (desc)  body += `<div class="card-desc">${renderMd(desc)}</div>`;
+
+  if (card.buttons && card.buttons.length > 0) {
+    body += '<div class="card-btns">';
+    normalizeButtons(card.buttons).forEach(btn => {
+      const label = btn.name || '?';
+      body += `<button class="card-btn" data-req='${escMd(JSON.stringify(btn.request))}'><span>${escMd(label)}</span><span class="card-btn-arrow">›</span></button>`;
+    });
+    body += '</div>';
+  }
+
+  if (body) inner += `<div class="card-body">${body}</div>`;
+  cardEl.innerHTML = inner;
+
+  cardEl.querySelectorAll('.card-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const req = JSON.parse(btn.dataset.req);
+      const label = btn.querySelector('span').textContent;
+      const actions = req?.payload?.actions || [];
+      const openUrl = actions.find(a => a.type === 'open_url');
+      if (openUrl?.payload?.url) {
+        window.open(openUrl.payload.url, '_blank', 'noopener');
+        return;
+      }
+      addUserMessage(label);
+      clearButtons();
+      disableInput();
+      interact(req);
+    });
+  });
+
+  return cardEl;
+}
+
+function addCardMessage(card) {
+  const cardKey = (card.title || '') + '|' + (card.description?.text || card.description || '');
+  if (isDuplicate(cardKey)) { console.log('[VF] Skipped duplicate card:', cardKey.slice(0, 60)); return; }
+  hideEmptyState();
+  const row = document.createElement('div');
+  row.className = 'bot-row bot-row--card';
+  const avatar = document.createElement('div');
+  avatar.className = 'bot-avatar';
+  avatar.innerHTML = `<img src="${AVATAR_SRC}" alt=""/>`;
+  row.appendChild(avatar);
+  row.appendChild(buildCardElement(card));
+  msgArea.appendChild(row);
+  scrollToBottom();
+}
+
+function addCarousel(cards) {
+  hideEmptyState();
+  if (!cards || cards.length === 0) return;
+  if (cards.length === 1) { addCardMessage(cards[0]); return; }
+
+  const row = document.createElement('div');
+  row.className = 'carousel-row';
+
+  const avatar = document.createElement('div');
+  avatar.className = 'bot-avatar';
+  avatar.innerHTML = `<img src="${AVATAR_SRC}" alt=""/>`;
+  row.appendChild(avatar);
+
+  const wrap = document.createElement('div');
+  wrap.className = 'carousel-wrap';
+
+  const track = document.createElement('div');
+  track.className = 'carousel-track';
+
+  cards.forEach(card => track.appendChild(buildCardElement(card)));
+  wrap.appendChild(track);
+
+  // Dots navigation
+  const dotsWrap = document.createElement('div');
+  dotsWrap.className = 'carousel-dots';
+  cards.forEach((_, i) => {
+    const dot = document.createElement('button');
+    dot.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+    dot.addEventListener('click', () => {
+      const cardWidth = track.children[0].offsetWidth + 10;
+      track.scrollTo({ left: i * cardWidth, behavior: 'smooth' });
+    });
+    dotsWrap.appendChild(dot);
+  });
+  wrap.appendChild(dotsWrap);
+
+  // Update dots on scroll
+  track.addEventListener('scroll', () => {
+    const cardWidth = track.children[0].offsetWidth + 10;
+    const index = Math.round(track.scrollLeft / cardWidth);
+    dotsWrap.querySelectorAll('.carousel-dot').forEach((d, i) => {
+      d.classList.toggle('active', i === index);
+    });
+  });
+
+  // Mouse drag-to-swipe for desktop
+  let _dragStartX = 0, _dragScrollLeft = 0, _isDragging = false;
+  track.addEventListener('mousedown', (e) => {
+    _isDragging = true;
+    _dragStartX = e.pageX - track.offsetLeft;
+    _dragScrollLeft = track.scrollLeft;
+    track.style.scrollSnapType = 'none';
+    track.style.cursor = 'grabbing';
+    e.preventDefault();
+  });
+  track.addEventListener('mousemove', (e) => {
+    if (!_isDragging) return;
+    const x = e.pageX - track.offsetLeft;
+    track.scrollLeft = _dragScrollLeft - (x - _dragStartX);
+  });
+  const endDrag = () => {
+    if (!_isDragging) return;
+    _isDragging = false;
+    track.style.cursor = 'grab';
+    track.style.scrollSnapType = 'x mandatory';
+    // Snap to nearest card
+    const cardWidth = track.children[0].offsetWidth + 10;
+    const index = Math.round(track.scrollLeft / cardWidth);
+    track.scrollTo({ left: index * cardWidth, behavior: 'smooth' });
+  };
+  track.addEventListener('mouseup', endDrag);
+  track.addEventListener('mouseleave', endDrag);
+
+  row.appendChild(wrap);
+  msgArea.appendChild(row);
+  scrollToBottom();
+}
+
+function showButtons(buttons) {
+  clearButtons();
+  if (!buttons || buttons.length === 0) return;
+  const wrap = document.createElement('div');
+  wrap.className = 'ams-buttons'; wrap.id = 'amsButtons';
+  buttons.forEach(btn => {
+    const b = document.createElement('button');
+    b.className = 'ams-btn';
+    const label = btn.name || btn.label || btn.text || '?';
+    b.innerHTML = `<span class="ams-btn-text">${label}</span><span class="ams-btn-arrow">&#x203A;</span>`;
+    b.onclick = () => {
+      addUserMessage(label);
+      clearButtons();
+      disableInput();
+      const req = btn.request || { type: 'text', payload: label };
+      interact(req);
+    };
+    wrap.appendChild(b);
+  });
+  msgArea.appendChild(wrap); scrollToBottom();
+}
+
+function enableInput() {
+  inputEnabled = true;
+  document.getElementById('userInput').disabled = false;
+  document.getElementById('sendBtn').disabled = false;
+  updatePlaceholder();
+  document.getElementById('userInput').focus();
+}
+
+function disableInput() {
+  inputEnabled = false;
+  document.getElementById('userInput').disabled = true;
+  document.getElementById('sendBtn').disabled = true;
+  updatePlaceholder();
+}
+
+async function interact(action) {
+  _autoContinueDepth = 0;
+  _suppressAutoScroll = false;
+  _lastBotMessage = ''; // Clear dedup on new user action
+  showTyping(); clearButtons(); disableInput();
+  try {
+    const res = await fetch(`${VF_CONFIG.runtimeURL}/state/user/${VF_CONFIG.userID}/interact`, {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json', 'Authorization':VF_CONFIG.apiKey, 'versionID':VF_CONFIG.versionID },
+      body: JSON.stringify({ action }),
+    });
+    if (!res.ok) throw new Error(`VF API ${res.status}`);
+    const traces = await res.json();
+    removeTyping();
+    await processTraces(traces);
+  } catch(err) {
+    removeTyping(); console.error(err);
+    addBotMessage(lang==='fr' ? '⚠️ Erreur de connexion. Veuillez réessayer.' : '⚠️ Connection error. Please try again.');
+    enableInput();
+  }
+}
+
+function normalizeButtons(rawBtns) {
+  // Voiceflow button shapes vary by version. Normalize them all.
+  return (rawBtns || []).map(btn => {
+    // Shape A: { name, request }  (classic Voiceflow)
+    // Shape B: { label, request }
+    // Shape C: { name, actions: [{type,payload}] }
+    // Shape D: { text, value }  (some custom integrations)
+    const name = btn.name || btn.label || btn.text || btn.title || JSON.stringify(btn);
+    let request = btn.request;
+    if (!request && btn.actions && btn.actions.length > 0) {
+      // actions array format
+      const a = btn.actions[0];
+      request = { type: a.type || 'intent', payload: a.payload || {} };
+    }
+    if (!request && btn.value !== undefined) {
+      request = { type: 'text', payload: btn.value };
+    }
+    if (!request) {
+      request = { type: 'text', payload: name };
+    }
+    return { name, request };
+  });
+}
+
+let _autoContinueDepth = 0;
+const MAX_AUTO_CONTINUE = 1; // Only 1 auto-advance per user action (prevents loops)
+
+async function processTraces(traces) {
+  console.log('[VF Traces]', JSON.stringify(traces, null, 2));
+
+  // Pre-scan: count visual elements to detect long responses
+  let visualCount = 0;
+  for (const t of traces) {
+    if (t.type === 'text' || t.type === 'speak') {
+      const msg = t.payload?.message || t.payload?.body || t.payload?.text || '';
+      if (msg) visualCount++;
+    }
+    if (t.type === 'cardV2') visualCount++;
+    if (t.type === 'carousel') visualCount += (t.payload?.cards || []).length;
+  }
+
+  _suppressAutoScroll = false;
+
+  let hasButtons=false, hasEnd=false, pendingButtons=[];
+  for (const trace of traces) {
+    switch(trace.type) {
+      case 'text': case 'speak': {
+        const msg = trace.payload?.message || trace.payload?.body || trace.payload?.text || '';
+        if(msg) {
+          await addBotMessage(msg);
+        }
+        break;
+      }
+      case 'choice': {
+        const raw = trace.payload?.buttons || trace.payload?.choices || [];
+        const btns = normalizeButtons(raw);
+        if(btns.length>0) { pendingButtons = pendingButtons.concat(btns); hasButtons=true; } break;
+      }
+      case 'visual': {
+        break;
+      }
+      case 'cardV2': {
+        addCardMessage(trace.payload);
+        break;
+      }
+      case 'carousel': {
+        addCarousel(trace.payload?.cards || []);
+        break;
+      }
+      case 'end': { hasEnd=true; break; }
+      default: {
+        const fallbackBtns = trace.payload?.buttons || trace.payload?.choices || [];
+        if(fallbackBtns.length > 0) {
+          const btns = normalizeButtons(fallbackBtns);
+          pendingButtons = pendingButtons.concat(btns); hasButtons=true;
+        }
+      }
+    }
+  }
+
+  // Auto-scroll kept active — no "see latest" button needed
+
+  if(hasButtons && pendingButtons.length>0) {
+    // Terminal: buttons found
+    _autoContinueDepth = 0;
+    showButtons(pendingButtons);
+    enableInput();
+  } else if (!hasEnd && visualCount > 0 && _autoContinueDepth < MAX_AUTO_CONTINUE) {
+    // Auto-advance ONCE: wait, then nudge Voiceflow to send the next step (e.g. carousel)
+    _autoContinueDepth++;
+    showTyping();
+    await new Promise(r => setTimeout(r, 2500));
+    try {
+      const res = await fetch(`${VF_CONFIG.runtimeURL}/state/user/${VF_CONFIG.userID}/interact`, {
+        method: 'POST',
+        headers: { 'Content-Type':'application/json', 'Authorization':VF_CONFIG.apiKey, 'versionID':VF_CONFIG.versionID },
+        body: JSON.stringify({ action: { type: 'text', payload: '' } }),
+      });
+      if (!res.ok) throw new Error(`VF API ${res.status}`);
+      const nextTraces = await res.json();
+      removeTyping();
+      await processTraces(nextTraces);
+    } catch(err) {
+      removeTyping(); console.error(err);
+      _autoContinueDepth = 0;
+      enableInput();
+    }
+  } else {
+    // Terminal: end trace received, or no content, or max depth
+    _autoContinueDepth = 0;
+    enableInput();
+  }
+}
+
+function handleSend(e) {
+  e.preventDefault();
+  const inp = document.getElementById('userInput');
+  const val = inp.value.trim();
+  if(!val||!inputEnabled) return;
+  addUserMessage(val); inp.value=''; disableInput();
+  interact({ type:'text', payload:val });
+}
+
+let _activeTypewriterTimer = null; // Track typewriter for cleanup
+
+function resetChat() {
+  _lastBotMessage = '';
+  _autoContinueDepth = 0;
+  if (_activeTypewriterTimer) { clearInterval(_activeTypewriterTimer); _activeTypewriterTimer = null; }
+  const divider = msgArea.querySelector('.date-divider');
+  msgArea.innerHTML = '';
+  if (divider) { divider.classList.remove('visible'); msgArea.appendChild(divider); }
+  const emptyDiv = document.createElement('div');
+  emptyDiv.className = 'ams-empty-state'; emptyDiv.id = 'emptyState';
+  emptyDiv.innerHTML = `<div class="empty-icon">💬</div><div class="empty-title" id="emptyTitle">${lang==='fr'?'Comment pouvons-nous vous aider?':'How can we help you?'}</div><div class="empty-sub" id="emptySub">${lang==='fr'?'Notre assistant IA est en train de se connecter...':'Our AI assistant is connecting...'}</div>`;
+  const skelDiv = document.createElement('div');
+  skelDiv.className = 'skeleton-row'; skelDiv.id = 'skeletonLoader';
+  skelDiv.innerHTML = '<div class="skeleton-avatar"></div><div class="skeleton-bubble w60"></div>';
+  msgArea.appendChild(emptyDiv);
+  msgArea.appendChild(skelDiv);
+  clearButtons(); disableInput();
+  VF_CONFIG.userID = 'ams-user-'+Math.random().toString(36).slice(2,10);
+  interact({ type:'launch' });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  interact({ type: 'launch' });
+});
+</script>
+</body>
+</html>
